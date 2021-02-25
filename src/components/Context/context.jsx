@@ -1219,7 +1219,9 @@ class InflowsProvider extends Component {
       .then(() => {
         this.init();
       })
-      .catch((res) => console.log(res));
+      .catch((res) => {
+        this.alert("Sign Up Error", "Unauthorized Email", "error");
+      });
   };
 
   /*delete a model */
