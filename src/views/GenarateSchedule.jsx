@@ -161,6 +161,9 @@ class GenerateSchedule extends Component {
     this.setState({ disabled });
     this.context.handleForecastDateChange(this.state.startDate);
   };
+  handleDateChangeRaw = (e) => {
+    e.preventDefault();
+  };
   render() {
     const { date } = this.context;
     const { disabled } = this.state;
@@ -184,14 +187,15 @@ class GenerateSchedule extends Component {
                           </label>
                           <div>
                             <KeyboardDatePicker
-                              autoOk
                               variant="inline"
+                              autoOk
                               inputVariant="outlined"
                               format="dd/MM/yyyy"
                               views={["year", "month", "date"]}
                               value={this.state.startDate}
                               InputAdornmentProps={{ position: "start" }}
                               onChange={(date) => this.handleChange(date)}
+                              onChangeRaw={this.handleDateChangeRaw}
                             />
                           </div>
                         </FormGroup>

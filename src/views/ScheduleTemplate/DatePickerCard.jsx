@@ -33,6 +33,9 @@ export class DatePickerCard extends Component {
   handleExportSchedules = () => {
     this.context.exportSchedules(this.state.startDate);
   };
+  handleDateChangeRaw = (e) => {
+    e.preventDefault();
+  };
   render() {
     const { date } = this.context;
     const { enableExport } = this.props;
@@ -54,6 +57,7 @@ export class DatePickerCard extends Component {
                       inputVariant="outlined"
                       format="dd/MM/yyyy"
                       views={["year", "month", "date"]}
+                      onChangeRaw={this.handleDateChangeRaw}
                       value={this.state.startDate}
                       InputAdornmentProps={{ position: "start" }}
                       onChange={(date) => this.handleChange(date)}
