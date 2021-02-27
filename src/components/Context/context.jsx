@@ -78,11 +78,11 @@ class InflowsProvider extends Component {
           value: "",
         },
         {
-          text: "Monthly Limit (m.a.s.l)",
+          text: "Daily Limit (m.a.s.l)",
           value: "",
         },
         {
-          text: "Monthly Limit (%)",
+          text: "Daily Limit (%)",
           value: "",
         },
         {
@@ -593,8 +593,8 @@ class InflowsProvider extends Component {
     }
 
     const percent = ((volume / 23600000) * 100).toFixed(2);
-    this.updateSummary("Monthly Limit (m.a.s.l)", limit);
-    this.updateSummary("Monthly Limit (%)", percent);
+    this.updateSummary("Daily Limit (m.a.s.l)", limit);
+    this.updateSummary("Daily Limit (%)", percent);
 
     this.populateSchedule(
       startDate,
