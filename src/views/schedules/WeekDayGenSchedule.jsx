@@ -9,11 +9,12 @@ export default class WeekDayGenSchedule extends Component {
     super();
     this.state = {
       columns: [
-        { title: "Time", field: "Time" },
-        { title: "Period", field: "Period" },
+        { title: "Time", field: "Time", editable: "never" },
+        { title: "Period", field: "Period", editable: "never" },
         { title: "Ezulwini", field: "EZULWINI" },
         { title: "Edwaleni", field: "EDWALENI" },
         { title: "Maguduza", field: "MAGUDUZA" },
+        { title: "Maguga", field: "MAGUGA", width: 10 },
       ],
       data: [],
       edit: [],
@@ -45,7 +46,7 @@ export default class WeekDayGenSchedule extends Component {
     const { columns, date } = this.state;
     return (
       <>
-        <Col md="12" lg="12" xl="6">
+        <Col md="12" lg="12" xl="7">
           <Card className="card-user">
             <CardHeader>
               <CardTitle tag="h4">Daily Generation Schedule</CardTitle>

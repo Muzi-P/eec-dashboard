@@ -31,6 +31,7 @@ class InflowsProvider extends Component {
       isAuthenticated: false,
       user: {},
       ezulwiniPS: {},
+      magugaPS: {},
       edwaleniPS: {},
       maguduzaPS: {},
       config: {},
@@ -172,6 +173,9 @@ class InflowsProvider extends Component {
           break;
         case "Ezulwini Power Station":
           this.setState({ ezulwiniPS: item });
+          break;
+        case "Maguga Power Station":
+          this.setState({ magugaPS: item });
           break;
         default:
           break;
@@ -514,6 +518,8 @@ class InflowsProvider extends Component {
       GS_15,
       GS_2,
       model,
+      Regulating_Weir,
+      Irrigation_Flow,
     } = state;
     let selectedModel = this.state.models.filter(
       (models) => models.Model_Name === model
@@ -526,6 +532,8 @@ class InflowsProvider extends Component {
       Ferreira: Ferreira,
       Luphohlo_Daily_Level: Luphohlo_Daily_Level,
       Mkinkomo_Reservoir_Daily_Level: Mkinkomo_Reservoir_Daily_Level,
+      Regulating_Weir: Regulating_Weir,
+      Irrigation_Flow: Irrigation_Flow,
     };
     await this.postInflow(inflow);
     this.updateSummary("Current Model", model);
@@ -600,7 +608,9 @@ class InflowsProvider extends Component {
       startDate,
       Luphohlo_Daily_Level,
       parseFloat(GS_2),
-      parseFloat(Ferreira)
+      parseFloat(Ferreira),
+      parseFloat(Regulating_Weir),
+      parseFloat(Irrigation_Flow)
     );
     this.storeSchedule(startDate);
   };
@@ -619,6 +629,7 @@ class InflowsProvider extends Component {
         powerStations.push(item.Name);
       }
     });
+    console.log(this.state.currentSchedule);
     powerStations.forEach((powerStation) => {
       let powerStationSchedule = {};
       powerStationSchedule["Schedule"] = [];
@@ -654,6 +665,12 @@ class InflowsProvider extends Component {
               item["maguduzaSumOffPeak"] >= 0
                 ? item["maguduzaSumOffPeak"]
                 : null,
+            magugaSumPeak:
+              item["magugaSumPeak"] >= 0 ? item["magugaSumPeak"] : null,
+            magugaSumStnd:
+              item["magugaSumStnd"] >= 0 ? item["magugaSumStnd"] : null,
+            magugaSumOffPeak:
+              item["magugaSumOffPeak"] >= 0 ? item["magugaSumOffPeak"] : null,
           });
         } else {
           let stationKey = powerStation.split(" ")[0].toUpperCase();
@@ -666,7 +683,7 @@ class InflowsProvider extends Component {
       powerStationSchedule["totals"] = totals;
       schedulesPostData["Power_Stations"].push(powerStationSchedule);
     });
-
+    console.log(schedulesPostData);
     axios.post(
       `${process.env.REACT_APP_API}/schedules`,
       schedulesPostData,
@@ -690,6 +707,9 @@ class InflowsProvider extends Component {
       case "Maguduza Power Station":
         power = hourlyGeneration.MAGUDUZA;
         break;
+      case "Maguga Power Station":
+        power = hourlyGeneration.MAGUGA;
+        break;
       default:
         break;
     }
@@ -703,7 +723,14 @@ class InflowsProvider extends Component {
    * @param GS_2
    * @param Ferreira
    */
-  populateSchedule = (startDate, Luphohlo_Daily_Level, GS_2, Ferreira) => {
+  populateSchedule = (
+    startDate,
+    Luphohlo_Daily_Level,
+    GS_2,
+    Ferreira,
+    Regulating_Weir,
+    Irrigation_Flow
+  ) => {
     const month = startDate.getMonth();
     const day = startDate.getDay();
     if (month === 5 || month === 6 || month === 7) {
@@ -711,6 +738,9 @@ class InflowsProvider extends Component {
         // weekends and peak season
         // only generate if there is a spillage
         this.populateScheduleWeekEndOffPeak(day);
+
+        // maguga
+        this.populateMagugaWeekDaySchedule(Regulating_Weir, Irrigation_Flow);
       } else {
         // weekday and peak season
         this.populateScheduleWeekDayPeakSeason(Luphohlo_Daily_Level);
@@ -723,6 +753,7 @@ class InflowsProvider extends Component {
       } else {
         // weekday and off-peak season
         this.populateScheduleWeekDayOffPeak(GS_2, Ferreira);
+        this.populateMagugaWeekDaySchedule(Regulating_Weir, Irrigation_Flow);
       }
     }
     this.calcSum();
@@ -936,6 +967,63 @@ class InflowsProvider extends Component {
     );
 
     await this.setState({ currentSchedule: generatedSchedule });
+  };
+  /**
+   *
+   * @param {*} Regulating_Weir maguga regulating weir
+   * @param {*} Irrigation_Flow maguga irrigation flow
+   */
+  populateMagugaWeekDaySchedule = async (Regulating_Weir, Irrigation_Flow) => {
+    /**
+     * 1. get available water
+     * 2. get number of hours required to replace water
+     * 3. Distribute the number of hours obtained by giving priority to peak periods.
+     */
+
+    const availableWater = this.calcDischargedWeirWater(Irrigation_Flow);
+    const waterConsumedEachSet = this.calcWaterConsumedByEachMagugaSetFullLoad();
+    let generatedSchedule = this.state.currentSchedule;
+    const availableHours = parseInt(availableWater / waterConsumedEachSet);
+
+    if (availableHours > 5) {
+      generatedSchedule = this.state.utils.methods.periodGen(
+        generatedSchedule,
+        "Peak",
+        "20",
+        "MAGUGA"
+      );
+    }
+    if (availableHours > 6) {
+      generatedSchedule = this.state.utils.methods.hourlyGen(
+        generatedSchedule,
+        ["6:00  -  7:00"],
+        "20",
+        "MAGUGA"
+      );
+    }
+    if (availableHours > 7) {
+      generatedSchedule = this.state.utils.methods.hourlyGen(
+        generatedSchedule,
+        ["17:00  -  18:00"],
+        "20",
+        "MAGUGA"
+      );
+    }
+    await this.setState({ currentSchedule: generatedSchedule });
+  };
+
+  /**
+   * Calculate the volume of irrigation water that will be discharged from the regulating weir in 24hrs.
+   * @param {*} Irrigation_Flow irrigation flow (m3/s)
+   */
+  calcDischargedWeirWater = (Irrigation_Flow) => {
+    return Irrigation_Flow * 24 * 60 * 60;
+  };
+
+  calcWaterConsumedByEachMagugaSetFullLoad = () => {
+    const ratedFlow = parseFloat(this.state.magugaPS.Genarators[0].Rated_Flow);
+
+    return ratedFlow * 60 * 60 * 20;
   };
   calcSum = async () => {
     let generatedSchedule = this.state.currentSchedule;

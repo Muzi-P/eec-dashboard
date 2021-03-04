@@ -376,6 +376,7 @@ const methods = {
       item.MAGUDUZA = "0";
       item.EZULWINI = "0";
       item.EDWALENI = "0";
+      item.MAGUGA = "0";
     });
     return schedule;
   },
@@ -399,15 +400,22 @@ const methods = {
     let maguduzaSumStnd = 0;
     let maguduzaSumOffPeak = 0;
 
+    let magugaSum = 0;
+    let magugaSumPeak = 0;
+    let magugaSumStnd = 0;
+    let magugaSumOffPeak = 0;
+
     schedule.forEach((item) => {
       /* sum */
       ezulwiniSum = ezulwiniSum + parseInt(item.EZULWINI);
       edwaleniSum = edwaleniSum + parseFloat(item.EDWALENI);
       maguduzaSum = maguduzaSum + parseFloat(item.MAGUDUZA);
+      magugaSum = magugaSum + parseFloat(item.MAGUGA);
       if (item.Period === "SUM") {
         item.EZULWINI = Math.round(ezulwiniSum * 10) / 10;
         item.EDWALENI = Math.round(edwaleniSum * 10) / 10;
         item.MAGUDUZA = Math.round(maguduzaSum * 10) / 10;
+        item.MAGUGA = Math.round(magugaSum * 10) / 10;
       }
 
       /* Peak sum */
@@ -415,11 +423,13 @@ const methods = {
         ezulwiniSumPeak = ezulwiniSumPeak + parseInt(item.EZULWINI);
         edwaleniSumPeak = edwaleniSumPeak + parseFloat(item.EDWALENI);
         maguduzaSumPeak = maguduzaSumPeak + parseFloat(item.MAGUDUZA);
+        magugaSumPeak = magugaSumPeak + parseFloat(item.MAGUGA);
       }
       if (item.Period === "PEAK") {
         item.EZULWINI = ezulwiniSumPeak;
         item.EDWALENI = Math.round(edwaleniSumPeak * 10) / 10;
         item.MAGUDUZA = Math.round(maguduzaSumPeak * 10) / 10;
+        item.MAGUGA = Math.round(magugaSumPeak * 10) / 10;
       }
 
       /* Standard sum */
@@ -427,11 +437,13 @@ const methods = {
         ezulwiniSumStnd = ezulwiniSumStnd + parseInt(item.EZULWINI);
         edwaleniSumStnd = edwaleniSumStnd + parseFloat(item.EDWALENI);
         maguduzaSumStnd = maguduzaSumStnd + parseFloat(item.MAGUDUZA);
+        magugaSumStnd = magugaSumStnd + parseFloat(item.MAGUGA);
       }
       if (item.Period === "STANDARD") {
         item.EZULWINI = ezulwiniSumStnd;
         item.EDWALENI = Math.round(edwaleniSumStnd * 10) / 10;
         item.MAGUDUZA = Math.round(maguduzaSumStnd * 10) / 10;
+        item.MAGUGA = Math.round(magugaSumStnd * 10) / 10;
       }
 
       /* Off-Peak sum */
@@ -439,11 +451,13 @@ const methods = {
         ezulwiniSumOffPeak = ezulwiniSumOffPeak + parseInt(item.EZULWINI);
         edwaleniSumOffPeak = edwaleniSumOffPeak + parseFloat(item.EDWALENI);
         maguduzaSumOffPeak = maguduzaSumOffPeak + parseFloat(item.MAGUDUZA);
+        magugaSumOffPeak = magugaSumOffPeak + parseFloat(item.MAGUGA);
       }
       if (item.Period === "OFF-PEAK") {
         item.EZULWINI = ezulwiniSumOffPeak;
         item.EDWALENI = Math.round(edwaleniSumOffPeak * 10) / 10;
         item.MAGUDUZA = Math.round(maguduzaSumOffPeak * 10) / 10;
+        item.MAGUGA = Math.round(magugaSumOffPeak * 10) / 10;
       }
     });
     return schedule;
@@ -513,6 +527,38 @@ const methods = {
         }
       }
     });
+    return schedule;
+  },
+  /********   Maguga Power Station     ************** */
+  /**
+   *
+   * @param {Array} schedule current schedule
+   * @param {Array} period type of period eg. Peak, Off-Peak
+   * @param {String} power power to be generated
+   * @param {String} station power station
+   */
+  periodGen: (schedule, period, power, station) => {
+    schedule.forEach((item) => {
+      if (item.Period === period) item[station] = power;
+    });
+
+    return schedule;
+  },
+  /*********************generate given period and time */
+  /**
+   *
+   * @param {Array} schedule current schedule
+   * @param {Array} periods range of hours
+   * @param {String} power power to be generated
+   * @param {String} station power station
+   */
+  hourlyGen: (schedule, periods, power, station) => {
+    periods.forEach((timePeriod) => {
+      schedule.forEach((item) => {
+        if (item.Time === timePeriod) item[station] = power;
+      });
+    });
+
     return schedule;
   },
 };
