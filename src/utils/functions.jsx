@@ -140,6 +140,138 @@ const methods = {
     }
     return result;
   },
+  magugaWeirLevelToVol: (level) => {
+    let result;
+    if (level < 512) {
+      result = 0;
+    } else if (level >= 512.1 && level <= 512.13) {
+      result = 175000;
+    } else if (level >= 512.14 && level <= 512.25) {
+      result = 188000;
+    } else if (level >= 512.26 && level <= 512.38) {
+      result = 190000;
+    } else if (level >= 512.39 && level <= 512.5) {
+      result = 200000;
+    } else if (level >= 512.51 && level <= 512.63) {
+      result = 205000;
+    } else if (level >= 512.64 && level <= 512.75) {
+      result = 213000;
+    } else if (level >= 512.76 && level <= 512.88) {
+      result = 219000;
+    } else if (level >= 512.89 && level <= 512.99) {
+      result = 225000;
+    } else if ((level = 513)) {
+      result = 225000;
+    } else if (level >= 513.01 && level <= 513.13) {
+      result = 238000;
+    } else if (level >= 513.14 && level <= 513.25) {
+      result = 244000;
+    } else if (level >= 513.26 && level <= 513.38) {
+      result = 250000;
+    } else if (level >= 513.39 && level <= 513.5) {
+      result = 263000;
+    } else if (level >= 513.51 && level <= 513.63) {
+      result = 275000;
+    } else if (level >= 513.64 && level <= 513.7) {
+      result = 280000;
+    } else if (level >= 513.71 && level <= 513.8) {
+      result = 288000;
+    } else if (level >= 513.81 && level <= 513.9) {
+      result = 300000;
+    } else if (level >= 513.91 && level <= 513.99) {
+      result = 288000;
+    } else if (level >= 514.01 && level <= 514.1) {
+      result = 313000;
+    } else if (level >= 514.11 && level <= 514.2) {
+      result = 325000;
+    } else if (level >= 514.21 && level <= 514.3) {
+      result = 338000;
+    } else if (level >= 514.31 && level <= 514.4) {
+      result = 350000;
+    } else if (level >= 514.41 && level <= 514.5) {
+      result = 356000;
+    } else if (level >= 514.51 && level <= 514.6) {
+      result = 369000;
+    } else if (level >= 514.61 && level <= 514.7) {
+      result = 381000;
+    } else if (level >= 514.71 && level <= 514.8) {
+      result = 398000;
+    } else if (level >= 514.81 && level <= 514.9) {
+      result = 400000;
+    } else if (level >= 514.91 && level <= 514.99) {
+      result = 413000;
+    } else if (level >= 515.01 && level <= 515.1) {
+      result = 425000;
+    } else if (level >= 515.11 && level <= 515.2) {
+      result = 438000;
+    } else if (level >= 515.21 && level <= 515.3) {
+      result = 450000;
+    } else if (level >= 515.31 && level <= 515.4) {
+      result = 468000;
+    } else if (level >= 515.41 && level <= 515.5) {
+      result = 475000;
+    } else if (level >= 515.51 && level <= 515.6) {
+      result = 492000;
+    } else if (level >= 515.61 && level <= 515.7) {
+      result = 507000;
+    } else if (level >= 515.71 && level <= 515.8) {
+      result = 525000;
+    } else if (level >= 515.81 && level <= 515.9) {
+      result = 538000;
+    } else if (level >= 515.91 && level <= 515.99) {
+      result = 550000;
+    } else if (level >= 516.01 && level <= 516.1) {
+      result = 569000;
+    } else if (level >= 516.11 && level <= 516.2) {
+      result = 580000;
+    } else if (level >= 516.21 && level <= 516.3) {
+      result = 600000;
+    } else if (level >= 516.31 && level <= 516.4) {
+      result = 613000;
+    } else if (level >= 516.41 && level <= 516.5) {
+      result = 625000;
+    } else if (level >= 516.51 && level <= 516.6) {
+      result = 644000;
+    } else if (level >= 516.61 && level <= 516.7) {
+      result = 663000;
+    } else if (level >= 516.71 && level <= 516.8) {
+      result = 675000;
+    } else if (level >= 516.81 && level <= 516.9) {
+      result = 694000;
+    } else if (level >= 516.91 && level <= 516.99) {
+      result = 710000;
+    } else if (level >= 517.01 && level <= 517.1) {
+      result = 725000;
+    } else if (level >= 517.11 && level <= 517.2) {
+      result = 744000;
+    } else if (level >= 517.21 && level <= 517.3) {
+      result = 763000;
+    } else if (level >= 517.31 && level <= 517.4) {
+      result = 775000;
+    } else if (level >= 517.41 && level <= 517.5) {
+      result = 800000;
+    } else if (level >= 517.51 && level <= 517.6) {
+      result = 813000;
+    } else if (level >= 517.61 && level <= 517.7) {
+      result = 834000;
+    } else if (level >= 517.71 && level <= 517.8) {
+      result = 850000;
+    } else if (level >= 517.81 && level <= 517.9) {
+      result = 875000;
+    } else if (level >= 517.91 && level <= 517.99) {
+      result = 888000;
+    } else if (level >= 518.01 && level <= 518.1) {
+      result = 913000;
+    } else if (level >= 518.21 && level <= 518.3) {
+      result = 950000;
+    } else if (level >= 518.31 && level <= 518.4) {
+      result = 969000;
+    } else if (level >= 518.41 && level <= 518.49) {
+      result = 978000;
+    }
+
+    return result;
+  },
   volToPerc: (volume) => {
     return ((volume / 23600000) * 100).toFixed(2);
   },
@@ -560,6 +692,62 @@ const methods = {
     });
 
     return schedule;
+  },
+  /**
+   *
+   * @param {Array} schedule current schedule
+   * @param {Array} periods range of hours
+   * @param {String} power power to be generated
+   * @param {String} station power stations
+   * @param {Number} availableHours available hours
+   */
+  hourlyGenWithLimit: (schedule, periods, power, station, availableHours) => {
+    // for (let index = 0; index < periods.length; index++) {
+    //   schedule.forEach((item) => {
+    //     if (item.Time === periods[index]) item[station] = power;
+    //   });
+    // }
+
+    periods.forEach((timePeriod) => {
+      if (availableHours < 0) {
+        return false;
+      }
+      schedule.forEach((item) => {
+        if (item.Time === timePeriod) item[station] = power;
+      });
+      availableHours--;
+    });
+
+    return schedule;
+  },
+
+  magugaWeekDayPriority: () => {
+    return [
+      "7:00  -  8:00",
+      "8:00  -  9:00",
+      "9:00  -  10:00",
+      "18:00  -  19:00",
+      "19:00  -  20:00",
+      "6:00  -  7:00",
+      "17:00  -  18:00",
+      "10:00  -  11:00",
+      "11:00  -  12:00",
+      "12:00  -  13:00",
+      "13:00  -  14:00",
+      "14:00  -  15:00",
+      "15:00  -  16:00",
+      "16:00  -  17:00",
+      "20:00  -  21:00",
+      "21:00 -  22:00",
+      "22:00  - 23:00",
+      "23:00  -  00:00",
+      "0:00  -  1:00",
+      "1:00  -  2:00",
+      "2:00  -  3:00",
+      "3:00  -  4:00",
+      "4:00  -  5:00",
+      "5:00  -  6:00",
+    ];
   },
 };
 

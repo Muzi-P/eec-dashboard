@@ -629,7 +629,6 @@ class InflowsProvider extends Component {
         powerStations.push(item.Name);
       }
     });
-    console.log(this.state.currentSchedule);
     powerStations.forEach((powerStation) => {
       let powerStationSchedule = {};
       powerStationSchedule["Schedule"] = [];
@@ -683,7 +682,6 @@ class InflowsProvider extends Component {
       powerStationSchedule["totals"] = totals;
       schedulesPostData["Power_Stations"].push(powerStationSchedule);
     });
-    console.log(schedulesPostData);
     axios.post(
       `${process.env.REACT_APP_API}/schedules`,
       schedulesPostData,
@@ -981,34 +979,46 @@ class InflowsProvider extends Component {
      */
 
     const availableWater = this.calcDischargedWeirWater(Irrigation_Flow);
-    const waterConsumedEachSet = this.calcWaterConsumedByEachMagugaSetFullLoad();
+    const waterConsumedEachSet = this.calcWaterConsumedByMagugaSetsFullLoad();
+    console.log(`available water ${availableWater}`);
     let generatedSchedule = this.state.currentSchedule;
-    const availableHours = parseInt(availableWater / waterConsumedEachSet);
-
-    if (availableHours > 5) {
-      generatedSchedule = this.state.utils.methods.periodGen(
-        generatedSchedule,
-        "Peak",
-        "20",
-        "MAGUGA"
-      );
-    }
-    if (availableHours > 6) {
-      generatedSchedule = this.state.utils.methods.hourlyGen(
-        generatedSchedule,
-        ["6:00  -  7:00"],
-        "20",
-        "MAGUGA"
-      );
-    }
-    if (availableHours > 7) {
-      generatedSchedule = this.state.utils.methods.hourlyGen(
-        generatedSchedule,
-        ["17:00  -  18:00"],
-        "20",
-        "MAGUGA"
-      );
-    }
+    const availableHours = parseFloat(availableWater / waterConsumedEachSet);
+    console.log(`available hours ${availableHours}`);
+    console.log(
+      `water consumed
+        ${this.calcWaterConsumedByMagugaSetsFullLoad() * availableHours}`
+    );
+    generatedSchedule = this.state.utils.methods.hourlyGenWithLimit(
+      generatedSchedule,
+      this.state.utils.methods.magugaWeekDayPriority(),
+      "20",
+      "MAGUGA",
+      availableHours
+    );
+    // if (availableHours > 5) {
+    //   generatedSchedule = this.state.utils.methods.periodGen(
+    //     generatedSchedule,
+    //     "Peak",
+    //     "20",
+    //     "MAGUGA"
+    //   );
+    // }
+    // if (availableHours > 6) {
+    //   generatedSchedule = this.state.utils.methods.hourlyGen(
+    //     generatedSchedule,
+    //     ["6:00  -  7:00"],
+    //     "20",
+    //     "MAGUGA"
+    //   );
+    // }
+    // if (availableHours > 7) {
+    //   generatedSchedule = this.state.utils.methods.hourlyGen(
+    //     generatedSchedule,
+    //     ["17:00  -  18:00"],
+    //     "20",
+    //     "MAGUGA"
+    //   );
+    // }
     await this.setState({ currentSchedule: generatedSchedule });
   };
 
@@ -1020,10 +1030,16 @@ class InflowsProvider extends Component {
     return Irrigation_Flow * 24 * 60 * 60;
   };
 
-  calcWaterConsumedByEachMagugaSetFullLoad = () => {
-    const ratedFlow = parseFloat(this.state.magugaPS.Genarators[0].Rated_Flow);
+  calcWaterConsumedByMagugaSetsFullLoad = () => {
+    const ratedFlowOne = parseFloat(
+      this.state.magugaPS.Genarators[0].Rated_Flow
+    );
+    const ratedFlowTwo = parseFloat(
+      this.state.magugaPS.Genarators[1].Rated_Flow
+    );
+    const waterConsumed = 60 * 60 * 10 * (ratedFlowOne + ratedFlowTwo);
 
-    return ratedFlow * 60 * 60 * 20;
+    return waterConsumed;
   };
   calcSum = async () => {
     let generatedSchedule = this.state.currentSchedule;

@@ -17,8 +17,8 @@ class Settings extends React.Component {
         <div className="content">
           <Row>
             <Ezulwini ezulwiniPS={ezulwiniPS} />
-            <Edwaleni edwaleniPS={edwaleniPS} />
             <Maguduza maguduzaPS={maguduzaPS} />
+            <Edwaleni edwaleniPS={edwaleniPS} />
             <Maguga magugaPS={magugaPS} />
           </Row>
         </div>
