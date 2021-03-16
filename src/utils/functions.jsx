@@ -279,6 +279,16 @@ const methods = {
     return schedule;
   },
 
+  /*********************Edwaleni Gen given period and time */
+  edwaleniPeriodGen: (schedule, periods, power, station) => {
+    periods.forEach((timePeriod) => {
+      schedule.forEach((item) => {
+        if (item.Time === timePeriod) item[station] = power;
+      });
+    });
+
+    return schedule;
+  },
   /*****Maguduza Peak *********/
   maguduzaPeakFullLoad: (schedule) => {
     schedule.forEach((item) => {

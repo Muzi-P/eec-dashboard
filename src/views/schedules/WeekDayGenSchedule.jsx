@@ -9,8 +9,8 @@ export default class WeekDayGenSchedule extends Component {
     super();
     this.state = {
       columns: [
-        { title: "Time", field: "Time" },
-        { title: "Period", field: "Period" },
+        { title: "Time", field: "Time", editable: "never" },
+        { title: "Period", field: "Period", editable: "never" },
         { title: "Ezulwini", field: "EZULWINI" },
         { title: "Edwaleni", field: "EDWALENI" },
         { title: "Maguduza", field: "MAGUDUZA" },
