@@ -2,7 +2,7 @@ import Dashboard from "./views/Dashboard";
 import Notifications from "./views/Notifications.jsx";
 import UserProfile from "./views/UserProfile.jsx";
 import PowerStations from "./views/Settings.jsx";
-import Configurations from "./views/Configurations";
+import Configurations from "./views/Configurations/index";
 import GenerateSchedule from "./views/GenarateSchedule";
 import Schedules from "./views/Schedules";
 import DrainageModels from "./views/DrainageModel";

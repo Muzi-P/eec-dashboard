@@ -57,7 +57,6 @@ export class DatePickerCard extends Component {
                       inputVariant="outlined"
                       format="dd/MM/yyyy"
                       views={["year", "month", "date"]}
-                      onChangeRaw={this.handleDateChangeRaw}
                       value={this.state.startDate}
                       InputAdornmentProps={{ position: "start" }}
                       onChange={(date) => this.handleChange(date)}

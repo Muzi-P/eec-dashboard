@@ -30,6 +30,7 @@ class InflowsProvider extends Component {
       ezulwini: [],
       isAuthenticated: false,
       user: {},
+      settings: {},
       ezulwiniPS: {},
       magugaPS: {},
       edwaleniPS: {},
@@ -126,10 +127,11 @@ class InflowsProvider extends Component {
     };
     await this.setState({ config });
     this.getAllInflows();
-    this.getAllModels();
     this.getCurrentUser();
     this.getAllPowerStations();
     this.getCurrentSchedule();
+    this.getSettings();
+    this.getAllModels();
   };
   /**
    * @description get all inflows
@@ -153,6 +155,20 @@ class InflowsProvider extends Component {
       .get(`${process.env.REACT_APP_API}/power-stations`, this.state.config)
       .then((res) => {
         this.formatStations(res.data);
+      })
+      .catch(() => {
+        this.setState({ isAuthenticated: false });
+      });
+  };
+
+  /**
+   * @description get all settings
+   */
+  getSettings = () => {
+    axios
+      .get(`${process.env.REACT_APP_API}/settings`, this.state.config)
+      .then((res) => {
+        this.setState({ settings: res.data });
       })
       .catch(() => {
         this.setState({ isAuthenticated: false });
@@ -187,6 +203,7 @@ class InflowsProvider extends Component {
    * @description get all models
    */
   getAllModels = () => {
+    this.setState({ loading: true });
     axios
       .get(`${process.env.REACT_APP_API}/models`, this.state.config)
       .then((res) => {
@@ -220,14 +237,41 @@ class InflowsProvider extends Component {
    * @description format model names
    */
   getAllModelNames = (models) => {
+    const defaultModel = this.state.settings.Default_Model;
     let modelNames = [];
     models.forEach((item) => {
       modelNames.push(item.Model_Name);
     });
+
+    let modelIndex = null;
+
+    modelNames.forEach((modelName, index) => {
+      if (modelName === defaultModel) {
+        modelIndex = index;
+      }
+    });
+
+    if (modelIndex) {
+      modelNames = this.swapElement(modelNames, 0, modelIndex);
+    }
     this.setState({ modelNames });
     // set default model
     this.setState({ reviewModels: [modelNames[0]] });
+    this.setState({ loading: false });
     this.handleDrainageModelChange(modelNames[0]);
+  };
+
+  /**
+   * swap array
+   * @param {*} array
+   * @param {*} indexA
+   * @param {*} indexB
+   */
+  swapElement = (array, indexA, indexB) => {
+    var tmp = array[indexA];
+    array[indexA] = array[indexB];
+    array[indexB] = tmp;
+    return array;
   };
   /**
    * @description get current schedules
@@ -242,7 +286,6 @@ class InflowsProvider extends Component {
         this.setState({ schedules: res.data });
       })
       .catch((res) => {
-        console.log(res);
         this.setState({ schedules: [] });
       });
   };
@@ -1179,6 +1222,7 @@ class InflowsProvider extends Component {
           "Inflows Added",
           `Date: ${res.data.Day_of_Input.split("T")[0]}`
         );
+        this.getAllInflows();
       })
       .catch((res) => console.log(res));
   };
@@ -1194,20 +1238,39 @@ class InflowsProvider extends Component {
       )
       .then((res) => {
         this.alert("Rated Flow Updated", res.data.Name);
+        this.getAllPowerStations();
       })
       .catch((res) => console.log(res));
   };
 
-  alert = (title, text, icon = "success") => {
+  /**
+   * @description edit config
+   * */
+  editConfig = (settings) => {
+    axios
+      .patch(
+        `${process.env.REACT_APP_API}/settings/edit`,
+        settings,
+        this.state.config
+      )
+      .then((res) => {
+        this.alert("Settings Updated");
+        this.getSettings();
+        this.getAllModels();
+      })
+      .catch((res) => console.log(res));
+  };
+
+  alert = (title, text = "", icon = "success") => {
     swal({
       title,
       text,
       icon,
       button: "Okay",
     }).then(() => {
-      this.getAllInflows();
-      this.getAllPowerStations();
-      this.getAllModels();
+      // this.getAllInflows();
+      // this.getAllPowerStations();
+      // this.getAllModels();
     });
   };
   /**
@@ -1269,6 +1332,7 @@ class InflowsProvider extends Component {
       )
       .then((res) => {
         this.alert("Model Updated", `Model Name: ${res.data.Model_Name}`);
+        this.getAllModels();
       })
       .catch((error) => console.log(error));
   };
@@ -1414,6 +1478,7 @@ class InflowsProvider extends Component {
           deleteModel: this.deleteModel,
           getAllModels: this.getAllModels,
           keepLoggedIn: this.keepLoggedIn,
+          editConfig: this.editConfig,
           logOut: this.logOut,
           signUp: this.signUp,
           exportSchedules: this.exportSchedules,

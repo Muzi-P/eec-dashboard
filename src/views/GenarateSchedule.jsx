@@ -210,7 +210,6 @@ class GenerateSchedule extends Component {
                               value={this.state.startDate}
                               InputAdornmentProps={{ position: "start" }}
                               onChange={(date) => this.handleChange(date)}
-                              onChangeRaw={this.handleDateChangeRaw}
                             />
                           </div>
                         </FormGroup>
