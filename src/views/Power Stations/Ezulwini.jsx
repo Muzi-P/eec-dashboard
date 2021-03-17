@@ -45,17 +45,16 @@ export class Ezulwini extends Component {
     };
   }
   handleEzuwliniInputChange = (e) => {
-    if (e.target.id === "Rated_Flow") {
-      this.setState({ disabled: false });
-      let ezulwiniPS = this.state.ezulwiniPS;
-      ezulwiniPS.Genarators[0].Rated_Flow = e.target.value;
-      this.setState({ ezulwiniPS });
-    }
+    this.setState({ disabled: false });
+    let ezulwiniPS = this.state.ezulwiniPS;
+    ezulwiniPS.Genarators[e.target.id].Rated_Flow = e.target.value;
+    this.setState({ ezulwiniPS });
   };
   handleRatedFlowChange = () => {
     this.context.editRatedFlow(this.state.ezulwiniPS);
     this.setState({ disabled: true });
   };
+  handleChange = () => {};
   render() {
     const { ezulwiniPS, disabled } = this.state;
     const { loading } = this.context;
@@ -74,7 +73,7 @@ export class Ezulwini extends Component {
                       <FormGroup>
                         <label>Total Power Output (MW)</label>
                         <Input
-                          onChange={this.handleEzuwliniInputChange}
+                          onChange={this.handleChange}
                           value={ezulwiniPS.Total_Power_Output}
                           type="text"
                         />
@@ -84,7 +83,7 @@ export class Ezulwini extends Component {
                       <FormGroup>
                         <label>Rated Head (m)</label>
                         <Input
-                          onChange={this.handleEzuwliniInputChange}
+                          onChange={this.handleChange}
                           value={ezulwiniPS.Rated_Head}
                           type="text"
                         />
@@ -103,7 +102,7 @@ export class Ezulwini extends Component {
                       <FormGroup>
                         <label>Rated Power (MW)</label>
                         <Input
-                          onChange={this.handleEzuwliniInputChange}
+                          onChange={this.handleChange}
                           value={ezulwiniPS.Genarators[0].Rated_Power}
                           type="text"
                         />
@@ -113,7 +112,7 @@ export class Ezulwini extends Component {
                       <FormGroup>
                         <label>Units</label>
                         <Input
-                          onChange={this.handleEzuwliniInputChange}
+                          onChange={this.handleChange}
                           value={ezulwiniPS.Genarators[0].Units}
                           type="text"
                         />
@@ -125,7 +124,37 @@ export class Ezulwini extends Component {
                         <Input
                           onChange={this.handleEzuwliniInputChange}
                           value={ezulwiniPS.Genarators[0].Rated_Flow}
-                          id="Rated_Flow"
+                          id="0"
+                          type="number"
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="pr-md-1" md="4">
+                      <FormGroup>
+                        <Input
+                          onChange={this.handleChange}
+                          value={ezulwiniPS.Genarators[1].Rated_Power}
+                          type="text"
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col className="px-md-1" md="4">
+                      <FormGroup>
+                        <Input
+                          onChange={this.handleChange}
+                          value={ezulwiniPS.Genarators[1].Units}
+                          type="text"
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col className="pl-md-1" md="4">
+                      <FormGroup>
+                        <Input
+                          onChange={this.handleEzuwliniInputChange}
+                          value={ezulwiniPS.Genarators[1].Rated_Flow}
+                          id="1"
                           type="number"
                         />
                       </FormGroup>

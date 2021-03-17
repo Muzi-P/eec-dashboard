@@ -16,10 +16,10 @@ class Settings extends React.Component {
       <>
         <div className="content">
           <Row>
-            <Ezulwini ezulwiniPS={ezulwiniPS} />
-            <Maguduza maguduzaPS={maguduzaPS} />
-            <Edwaleni edwaleniPS={edwaleniPS} />
             <Maguga magugaPS={magugaPS} />
+            <Ezulwini ezulwiniPS={ezulwiniPS} />
+            <Edwaleni edwaleniPS={edwaleniPS} />
+            <Maguduza maguduzaPS={maguduzaPS} />
           </Row>
         </div>
       </>
