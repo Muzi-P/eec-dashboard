@@ -30,6 +30,9 @@ class GenerateSchedule extends Component {
       placeholder: "dangerouslySetInnerHTML={hello}",
       Mkinkomo_Reservoir_Daily_Level: "",
       Luphohlo_Daily_Level: "",
+      Irrigation_Flow: "",
+      Regulating_Weir: "",
+      Maguga_Downstream_Wear_Limit: "",
       Ferreira: "",
       GS_15: "",
       GS_2: "",
@@ -43,6 +46,9 @@ class GenerateSchedule extends Component {
         "Ferreira",
         "GS_15",
         "GS_2",
+        "Irrigation_Flow",
+        "Regulating_Weir",
+        "Maguga_Downstream_Wear_Limit",
       ],
     };
   }
@@ -57,6 +63,18 @@ class GenerateSchedule extends Component {
   componentDidMount = () => {
     this.context.handleForecastDateChange(this.state.startDate);
   };
+  componentDidUpdate(prevProps) {
+    // Typical usage (don't forget to compare props):
+    if (
+      !this.state.Maguga_Downstream_Wear_Limit &&
+      Object.keys(this.context.settings).length !== 0
+    ) {
+      this.setState({
+        Maguga_Downstream_Wear_Limit: this.context.settings
+          .Maguga_Downstream_Wear_Limit,
+      });
+    }
+  }
 
   handleInputChange = async (e) => {
     await this.setState({
@@ -138,6 +156,8 @@ class GenerateSchedule extends Component {
       GS_15,
       GS_2,
       Day_of_Input,
+      Regulating_Weir,
+      Irrigation_Flow,
     } = lastInflow;
     await this.setState({
       Mkinkomo_Reservoir_Daily_Level,
@@ -149,10 +169,19 @@ class GenerateSchedule extends Component {
       Ferreira,
     });
     await this.setState({
+      Ferreira,
+    });
+    await this.setState({
       GS_15,
     });
     await this.setState({
       GS_2,
+    });
+    await this.setState({
+      Regulating_Weir,
+    });
+    await this.setState({
+      Irrigation_Flow,
     });
     await this.setState({
       startDate: new Date(Day_of_Input),
@@ -165,8 +194,8 @@ class GenerateSchedule extends Component {
     e.preventDefault();
   };
   render() {
-    const { date } = this.context;
-    const { disabled } = this.state;
+    const { date, loading } = this.context;
+    const { disabled, Maguga_Downstream_Wear_Limit } = this.state;
     return (
       <>
         <div className="content">
@@ -195,7 +224,6 @@ class GenerateSchedule extends Component {
                               value={this.state.startDate}
                               InputAdornmentProps={{ position: "start" }}
                               onChange={(date) => this.handleChange(date)}
-                              onChangeRaw={this.handleDateChangeRaw}
                             />
                           </div>
                         </FormGroup>
@@ -233,7 +261,7 @@ class GenerateSchedule extends Component {
                           />
                         </FormGroup>
                       </Col>
-                      <Col className="pl-md-1" md="3">
+                      <Col className="pr-md-1" md="3">
                         <FormGroup>
                           <label>GS_15</label>
                           <Input
@@ -247,7 +275,7 @@ class GenerateSchedule extends Component {
                           />
                         </FormGroup>
                       </Col>
-                      <Col className="pl-md-1" md="3">
+                      <Col className="pr-md-1" md="3">
                         <FormGroup>
                           <label>GS_2</label>
                           <Input
@@ -261,9 +289,23 @@ class GenerateSchedule extends Component {
                           />
                         </FormGroup>
                       </Col>
+                      <Col className="pr-md-1" md="3">
+                        <FormGroup>
+                          <label>Mkinkomo Level</label>
+                          <Input
+                            id="Mkinkomo_Reservoir_Daily_Level"
+                            required
+                            placeholder="m.a.s.l."
+                            type="number"
+                            value={this.state.Mkinkomo_Reservoir_Daily_Level}
+                            onChange={this.handleInputChange}
+                            onBlur={this.mkinkomoOnfocusOut}
+                          />
+                        </FormGroup>
+                      </Col>
                     </Row>
                     <Row>
-                      <Col className="pr-md-1" md="4">
+                      {/* <Col className="pr-md-1" md="4">
                         <FormGroup>
                           <label>Mkinkomo Reservoir Daily Level</label>
                           <Input
@@ -276,8 +318,8 @@ class GenerateSchedule extends Component {
                             onBlur={this.mkinkomoOnfocusOut}
                           />
                         </FormGroup>
-                      </Col>
-                      <Col className="pl-md-1" md="3">
+                      </Col> */}
+                      <Col className="pr-md-1" md="3">
                         <FormGroup>
                           <label>Ferreira</label>
                           <Input
@@ -287,6 +329,48 @@ class GenerateSchedule extends Component {
                             type="number"
                             onBlur={this.gsOnfocusOut}
                             value={this.state.Ferreira}
+                            onChange={this.handleInputChange}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col className="pr-md-1" md="3">
+                        <FormGroup>
+                          <label>Irrigation Flow</label>
+                          <Input
+                            id="Irrigation_Flow"
+                            required
+                            placeholder="m³/s"
+                            type="number"
+                            // onBlur={this.gsOnfocusOut}
+                            value={this.state.Irrigation_Flow}
+                            onChange={this.handleInputChange}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col className="pr-md-1" md="3">
+                        <FormGroup>
+                          <label>Weir Daily Level</label>
+                          <Input
+                            id="Regulating_Weir"
+                            required
+                            placeholder="m.a.s.l"
+                            type="number"
+                            // onBlur={this.gsOnfocusOut}
+                            value={this.state.Regulating_Weir}
+                            onChange={this.handleInputChange}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col className="pr-md-1" md="3">
+                        <FormGroup>
+                          <label>Weir Limit</label>
+                          <Input
+                            id="Maguga_Downstream_Wear_Limit"
+                            required
+                            placeholder="m.a.s.l"
+                            type="number"
+                            // onBlur={this.gsOnfocusOut}
+                            value={Maguga_Downstream_Wear_Limit}
                             onChange={this.handleInputChange}
                           />
                         </FormGroup>
@@ -309,6 +393,7 @@ class GenerateSchedule extends Component {
                     color="info"
                     type="button"
                     onClick={this.loadPreviousInflows}
+                    disabled={loading}
                   >
                     Load Previous Inflows
                   </Button>

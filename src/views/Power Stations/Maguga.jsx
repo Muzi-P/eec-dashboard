@@ -14,12 +14,12 @@ import {
   Col,
 } from "reactstrap";
 
-export class Ezulwini extends Component {
+export class Maguga extends Component {
   static contextType = InflowsContext;
   constructor(props) {
     super();
     this.state = {
-      ezulwiniPS: {
+      magugaPS: {
         Name: "Edwaleni Power Station",
         Rated_Head: "262",
         Total_Power_Output: "15",
@@ -41,22 +41,22 @@ export class Ezulwini extends Component {
   }
   static getDerivedStateFromProps(nextProps) {
     return {
-      ezulwiniPS: nextProps.ezulwiniPS,
+      magugaPS: nextProps.magugaPS,
     };
   }
   handleEzuwliniInputChange = (e) => {
     this.setState({ disabled: false });
-    let ezulwiniPS = this.state.ezulwiniPS;
-    ezulwiniPS.Genarators[e.target.id].Rated_Flow = e.target.value;
-    this.setState({ ezulwiniPS });
+    let magugaPS = this.state.magugaPS;
+    magugaPS.Genarators[e.target.id].Rated_Flow = e.target.value;
+    this.setState({ magugaPS });
   };
   handleRatedFlowChange = () => {
-    this.context.editRatedFlow(this.state.ezulwiniPS);
+    this.context.editRatedFlow(this.state.magugaPS);
     this.setState({ disabled: true });
   };
   handleChange = () => {};
   render() {
-    const { ezulwiniPS, disabled } = this.state;
+    const { magugaPS, disabled } = this.state;
     const { loading } = this.context;
     return (
       <>
@@ -64,7 +64,7 @@ export class Ezulwini extends Component {
           <Col md="12" lg="12" xl="6">
             <Card>
               <CardHeader>
-                <h5 className="title">{ezulwiniPS.Name}</h5>
+                <h5 className="title">{magugaPS.Name}</h5>
               </CardHeader>
               <CardBody>
                 <Form>
@@ -74,7 +74,7 @@ export class Ezulwini extends Component {
                         <label>Total Power Output (MW)</label>
                         <Input
                           onChange={this.handleChange}
-                          value={ezulwiniPS.Total_Power_Output}
+                          value={magugaPS.Total_Power_Output}
                           type="text"
                         />
                       </FormGroup>
@@ -84,7 +84,7 @@ export class Ezulwini extends Component {
                         <label>Rated Head (m)</label>
                         <Input
                           onChange={this.handleChange}
-                          value={ezulwiniPS.Rated_Head}
+                          value={magugaPS.Rated_Head}
                           type="text"
                         />
                       </FormGroup>
@@ -103,7 +103,7 @@ export class Ezulwini extends Component {
                         <label>Rated Power (MW)</label>
                         <Input
                           onChange={this.handleChange}
-                          value={ezulwiniPS.Genarators[0].Rated_Power}
+                          value={magugaPS.Genarators[0].Rated_Power}
                           type="text"
                         />
                       </FormGroup>
@@ -113,7 +113,7 @@ export class Ezulwini extends Component {
                         <label>Units</label>
                         <Input
                           onChange={this.handleChange}
-                          value={ezulwiniPS.Genarators[0].Units}
+                          value={magugaPS.Genarators[0].Units}
                           type="text"
                         />
                       </FormGroup>
@@ -123,7 +123,7 @@ export class Ezulwini extends Component {
                         <label>Rated Flow (m³/s/MW)</label>
                         <Input
                           onChange={this.handleEzuwliniInputChange}
-                          value={ezulwiniPS.Genarators[0].Rated_Flow}
+                          value={magugaPS.Genarators[0].Rated_Flow}
                           id="0"
                           type="number"
                         />
@@ -135,7 +135,7 @@ export class Ezulwini extends Component {
                       <FormGroup>
                         <Input
                           onChange={this.handleChange}
-                          value={ezulwiniPS.Genarators[1].Rated_Power}
+                          value={magugaPS.Genarators[1].Rated_Power}
                           type="text"
                         />
                       </FormGroup>
@@ -144,7 +144,7 @@ export class Ezulwini extends Component {
                       <FormGroup>
                         <Input
                           onChange={this.handleChange}
-                          value={ezulwiniPS.Genarators[1].Units}
+                          value={magugaPS.Genarators[1].Units}
                           type="text"
                         />
                       </FormGroup>
@@ -153,7 +153,7 @@ export class Ezulwini extends Component {
                       <FormGroup>
                         <Input
                           onChange={this.handleEzuwliniInputChange}
-                          value={ezulwiniPS.Genarators[1].Rated_Flow}
+                          value={magugaPS.Genarators[1].Rated_Flow}
                           id="1"
                           type="number"
                         />
@@ -181,4 +181,4 @@ export class Ezulwini extends Component {
   }
 }
 
-export default Ezulwini;
+export default Maguga;

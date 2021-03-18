@@ -30,7 +30,9 @@ class InflowsProvider extends Component {
       ezulwini: [],
       isAuthenticated: false,
       user: {},
+      settings: {},
       ezulwiniPS: {},
+      magugaPS: {},
       edwaleniPS: {},
       maguduzaPS: {},
       config: {},
@@ -109,6 +111,10 @@ class InflowsProvider extends Component {
           text: "Final Dam Level(%)",
           value: "",
         },
+        {
+          text: "Maguga Weir Limit(m.a.s.l)",
+          value: "",
+        },
       ],
     };
   }
@@ -125,19 +131,22 @@ class InflowsProvider extends Component {
     };
     await this.setState({ config });
     this.getAllInflows();
-    this.getAllModels();
     this.getCurrentUser();
     await this.getAllPowerStations();
     this.getCurrentSchedule();
+    this.getSettings();
+    this.getAllModels();
   };
   /**
    * @description get all inflows
    */
   getAllInflows = () => {
+    this.setState({ loading: true });
     axios
       .get(`${process.env.REACT_APP_API}/inflows`, this.state.config)
       .then((res) => {
         this.setState({ inflows: res.data });
+        this.setState({ loading: false });
         this.getAllYears(res.data);
       })
       .catch(() => {
@@ -152,6 +161,20 @@ class InflowsProvider extends Component {
       .get(`${process.env.REACT_APP_API}/power-stations`, this.state.config)
       .then((res) => {
         this.formatStations(res.data);
+      })
+      .catch(() => {
+        this.setState({ isAuthenticated: false });
+      });
+  };
+
+  /**
+   * @description get all settings
+   */
+  getSettings = () => {
+    axios
+      .get(`${process.env.REACT_APP_API}/settings`, this.state.config)
+      .then((res) => {
+        this.setState({ settings: res.data });
       })
       .catch(() => {
         this.setState({ isAuthenticated: false });
@@ -173,6 +196,9 @@ class InflowsProvider extends Component {
         case "Ezulwini Power Station":
           this.setState({ ezulwiniPS: item });
           break;
+        case "Maguga Power Station":
+          this.setState({ magugaPS: item });
+          break;
         default:
           break;
       }
@@ -183,6 +209,7 @@ class InflowsProvider extends Component {
    * @description get all models
    */
   getAllModels = () => {
+    this.setState({ loading: true });
     axios
       .get(`${process.env.REACT_APP_API}/models`, this.state.config)
       .then((res) => {
@@ -216,14 +243,41 @@ class InflowsProvider extends Component {
    * @description format model names
    */
   getAllModelNames = (models) => {
+    const defaultModel = this.state.settings.Default_Model;
     let modelNames = [];
     models.forEach((item) => {
       modelNames.push(item.Model_Name);
     });
+
+    let modelIndex = null;
+
+    modelNames.forEach((modelName, index) => {
+      if (modelName === defaultModel) {
+        modelIndex = index;
+      }
+    });
+
+    if (modelIndex) {
+      modelNames = this.swapElement(modelNames, 0, modelIndex);
+    }
     this.setState({ modelNames });
     // set default model
     this.setState({ reviewModels: [modelNames[0]] });
+    this.setState({ loading: false });
     this.handleDrainageModelChange(modelNames[0]);
+  };
+
+  /**
+   * swap array
+   * @param {*} array
+   * @param {*} indexA
+   * @param {*} indexB
+   */
+  swapElement = (array, indexA, indexB) => {
+    var tmp = array[indexA];
+    array[indexA] = array[indexB];
+    array[indexB] = tmp;
+    return array;
   };
   /**
    * @description get current schedules
@@ -238,7 +292,6 @@ class InflowsProvider extends Component {
         this.setState({ schedules: res.data });
       })
       .catch((res) => {
-        console.log(res);
         this.setState({ schedules: [] });
       });
   };
@@ -514,6 +567,9 @@ class InflowsProvider extends Component {
       GS_15,
       GS_2,
       model,
+      Regulating_Weir,
+      Irrigation_Flow,
+      Maguga_Downstream_Wear_Limit,
     } = state;
     let selectedModel = this.state.models.filter(
       (models) => models.Model_Name === model
@@ -526,9 +582,15 @@ class InflowsProvider extends Component {
       Ferreira: Ferreira,
       Luphohlo_Daily_Level: Luphohlo_Daily_Level,
       Mkinkomo_Reservoir_Daily_Level: Mkinkomo_Reservoir_Daily_Level,
+      Regulating_Weir: Regulating_Weir,
+      Irrigation_Flow: Irrigation_Flow,
     };
     await this.postInflow(inflow);
     this.updateSummary("Current Model", model);
+    this.updateSummary(
+      "Maguga Weir Limit(m.a.s.l)",
+      Maguga_Downstream_Wear_Limit
+    );
     this.updateSummary("Initial Dam Level (m.a.s.l)", Luphohlo_Daily_Level);
     this.updateSummary(
       "Current Month",
@@ -600,7 +662,10 @@ class InflowsProvider extends Component {
       startDate,
       Luphohlo_Daily_Level,
       parseFloat(GS_2),
-      parseFloat(Ferreira)
+      parseFloat(Ferreira),
+      parseFloat(Regulating_Weir),
+      parseFloat(Irrigation_Flow),
+      parseFloat(Maguga_Downstream_Wear_Limit)
     );
     this.storeSchedule(startDate);
   };
@@ -654,6 +719,12 @@ class InflowsProvider extends Component {
               item["maguduzaSumOffPeak"] >= 0
                 ? item["maguduzaSumOffPeak"]
                 : null,
+            magugaSumPeak:
+              item["magugaSumPeak"] >= 0 ? item["magugaSumPeak"] : null,
+            magugaSumStnd:
+              item["magugaSumStnd"] >= 0 ? item["magugaSumStnd"] : null,
+            magugaSumOffPeak:
+              item["magugaSumOffPeak"] >= 0 ? item["magugaSumOffPeak"] : null,
           });
         } else {
           let stationKey = powerStation.split(" ")[0].toUpperCase();
@@ -666,7 +737,6 @@ class InflowsProvider extends Component {
       powerStationSchedule["totals"] = totals;
       schedulesPostData["Power_Stations"].push(powerStationSchedule);
     });
-
     axios.post(
       `${process.env.REACT_APP_API}/schedules`,
       schedulesPostData,
@@ -690,6 +760,9 @@ class InflowsProvider extends Component {
       case "Maguduza Power Station":
         power = hourlyGeneration.MAGUDUZA;
         break;
+      case "Maguga Power Station":
+        power = hourlyGeneration.MAGUGA;
+        break;
       default:
         break;
     }
@@ -703,7 +776,15 @@ class InflowsProvider extends Component {
    * @param GS_2
    * @param Ferreira
    */
-  populateSchedule = (startDate, Luphohlo_Daily_Level, GS_2, Ferreira) => {
+  populateSchedule = (
+    startDate,
+    Luphohlo_Daily_Level,
+    GS_2,
+    Ferreira,
+    Regulating_Weir,
+    Irrigation_Flow,
+    Maguga_Downstream_Wear_Limit
+  ) => {
     const month = startDate.getMonth();
     const day = startDate.getDay();
     if (month === 5 || month === 6 || month === 7) {
@@ -711,6 +792,13 @@ class InflowsProvider extends Component {
         // weekends and peak season
         // only generate if there is a spillage
         this.populateScheduleWeekEndOffPeak(day);
+
+        // maguga
+        this.populateMagugaWeekDaySchedule(
+          Regulating_Weir,
+          Irrigation_Flow,
+          Maguga_Downstream_Wear_Limit
+        );
       } else {
         // weekday and peak season
         this.populateScheduleWeekDayPeakSeason(Luphohlo_Daily_Level);
@@ -723,6 +811,11 @@ class InflowsProvider extends Component {
       } else {
         // weekday and off-peak season
         this.populateScheduleWeekDayOffPeak(GS_2, Ferreira);
+        this.populateMagugaWeekDaySchedule(
+          Regulating_Weir,
+          Irrigation_Flow,
+          Maguga_Downstream_Wear_Limit
+        );
       }
     }
     this.calcSum();
@@ -998,6 +1091,70 @@ class InflowsProvider extends Component {
 
     await this.setState({ currentSchedule: generatedSchedule });
   };
+  /**
+   *
+   * @param {*} Regulating_Weir maguga regulating weir
+   * @param {*} Irrigation_Flow maguga irrigation flow
+   */
+  populateMagugaWeekDaySchedule = async (
+    Regulating_Weir,
+    Irrigation_Flow,
+    Maguga_Downstream_Wear_Limit
+  ) => {
+    /**
+     * 1. get available water
+     *  ***Final water  -  (current weir water - water needed for irrigation)
+     * 2. get number of hours required to replace water
+     * 3. Distribute the number of hours obtained by giving priority to peak periods.
+     */
+    const currentVolume = this.state.utils.methods.magugaWeirLevelToVol(
+      Regulating_Weir
+    );
+    const finalVolume = this.state.utils.methods.magugaWeirLevelToVol(
+      Maguga_Downstream_Wear_Limit
+    );
+
+    const irrigationVolume = this.calcDischargedWeirWater(Irrigation_Flow);
+    const waterConsumedEachSet = this.calcWaterConsumedByMagugaSetsFullLoad();
+
+    const availableWater = finalVolume - (currentVolume - irrigationVolume);
+
+    console.log("current volume", currentVolume);
+    console.log("final volume", finalVolume);
+    console.log("water needed for irrigation", irrigationVolume);
+    console.log("available water", availableWater);
+    let generatedSchedule = this.state.currentSchedule;
+    const availableHours = parseFloat(availableWater / waterConsumedEachSet);
+    console.log("available hours", availableHours);
+    generatedSchedule = this.state.utils.methods.hourlyGenWithLimit(
+      generatedSchedule,
+      this.state.utils.methods.magugaWeekDayPriority(),
+      "20",
+      "MAGUGA",
+      availableHours
+    );
+    await this.setState({ currentSchedule: generatedSchedule });
+  };
+
+  /**
+   * Calculate the volume of irrigation water that will be discharged from the regulating weir in 24hrs.
+   * @param {*} Irrigation_Flow irrigation flow (m3/s)
+   */
+  calcDischargedWeirWater = (Irrigation_Flow) => {
+    return Irrigation_Flow * 24 * 60 * 60;
+  };
+
+  calcWaterConsumedByMagugaSetsFullLoad = () => {
+    const ratedFlowOne = parseFloat(
+      this.state.magugaPS.Genarators[0].Rated_Flow
+    );
+    const ratedFlowTwo = parseFloat(
+      this.state.magugaPS.Genarators[1].Rated_Flow
+    );
+    const waterConsumed = 60 * 60 * 10 * (ratedFlowOne + ratedFlowTwo);
+
+    return waterConsumed;
+  };
   calcSum = async () => {
     let generatedSchedule = this.state.currentSchedule;
     generatedSchedule = this.state.utils.methods.calcSum(generatedSchedule);
@@ -1136,6 +1293,7 @@ class InflowsProvider extends Component {
           "Inflows Added",
           `Date: ${res.data.Day_of_Input.split("T")[0]}`
         );
+        this.getAllInflows();
       })
       .catch((res) => console.log(res));
   };
@@ -1151,20 +1309,39 @@ class InflowsProvider extends Component {
       )
       .then((res) => {
         this.alert("Rated Flow Updated", res.data.Name);
+        this.getAllPowerStations();
       })
       .catch((res) => console.log(res));
   };
 
-  alert = (title, text, icon = "success") => {
+  /**
+   * @description edit config
+   * */
+  editConfig = (settings) => {
+    axios
+      .patch(
+        `${process.env.REACT_APP_API}/settings/edit`,
+        settings,
+        this.state.config
+      )
+      .then((res) => {
+        this.alert("Settings Updated");
+        this.getSettings();
+        this.getAllModels();
+      })
+      .catch((res) => console.log(res));
+  };
+
+  alert = (title, text = "", icon = "success") => {
     swal({
       title,
       text,
       icon,
       button: "Okay",
     }).then(() => {
-      this.getAllInflows();
-      this.getAllPowerStations();
-      this.getAllModels();
+      // this.getAllInflows();
+      // this.getAllPowerStations();
+      // this.getAllModels();
     });
   };
   /**
@@ -1226,6 +1403,7 @@ class InflowsProvider extends Component {
       )
       .then((res) => {
         this.alert("Model Updated", `Model Name: ${res.data.Model_Name}`);
+        this.getAllModels();
       })
       .catch((error) => console.log(error));
   };
@@ -1371,6 +1549,7 @@ class InflowsProvider extends Component {
           deleteModel: this.deleteModel,
           getAllModels: this.getAllModels,
           keepLoggedIn: this.keepLoggedIn,
+          editConfig: this.editConfig,
           logOut: this.logOut,
           signUp: this.signUp,
           exportSchedules: this.exportSchedules,

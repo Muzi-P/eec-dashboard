@@ -4,6 +4,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -11,6 +12,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -18,6 +20,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -25,6 +28,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -32,6 +36,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -39,6 +44,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -46,6 +52,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0,
     "ezulwiniSumOffPeak": 0,
     "edwaleniSumOffPeak": 0,
@@ -56,6 +63,7 @@
     "Period": "Standard",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -63,6 +71,7 @@
     "Period": "Standard",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -70,6 +79,7 @@
     "Period": "Standard",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -77,6 +87,7 @@
     "Period": "Standard",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -84,6 +95,7 @@
     "Period": "Standard",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0,
     "ezulwiniSumStnd": 0,
     "edwaleniSumStnd": 0,
@@ -94,6 +106,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -101,6 +114,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -108,6 +122,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -115,6 +130,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -122,6 +138,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -129,6 +146,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0,
     "ezulwiniSumOffPeak": 0,
     "edwaleniSumOffPeak": 0,
@@ -139,6 +157,7 @@
     "Period": "Standard",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -146,6 +165,7 @@
     "Period": "Standard",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0,
     "ezulwiniSumStnd": 0,
     "edwaleniSumStnd": 0,
@@ -156,6 +176,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -163,6 +184,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -170,6 +192,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -177,6 +200,7 @@
     "Period": "Off-Peak",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0,
     "ezulwiniSumOffPeak": 0,
     "edwaleniSumOffPeak": 0,
@@ -187,6 +211,7 @@
     "Period": "SUM",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -194,6 +219,7 @@
     "Period": "PEAK",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -201,6 +227,7 @@
     "Period": "STANDARD",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   },
   {
@@ -208,6 +235,7 @@
     "Period": "OFF-PEAK",
     "EZULWINI": 0,
     "EDWALENI": 0,
+    "MAGUGA": 0,
     "MAGUDUZA": 0
   }
 ]

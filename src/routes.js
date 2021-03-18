@@ -1,7 +1,8 @@
 import Dashboard from "./views/Dashboard";
 import Notifications from "./views/Notifications.jsx";
 import UserProfile from "./views/UserProfile.jsx";
-import Settings from "./views/Settings.jsx";
+import PowerStations from "./views/Settings.jsx";
+import Configurations from "./views/Configurations/index";
 import GenerateSchedule from "./views/GenarateSchedule";
 import Schedules from "./views/Schedules";
 import DrainageModels from "./views/DrainageModel";
@@ -48,11 +49,19 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/power-stations",
+    name: "Power Stations",
+    rtlName: "ملف تعريفي للمستخدم",
+    icon: "tim-icons icon-bulb-63",
+    component: PowerStations,
+    layout: "/admin",
+  },
+  {
     path: "/settings",
     name: "Settings",
     rtlName: "ملف تعريفي للمستخدم",
     icon: "tim-icons icon-settings-gear-63",
-    component: Settings,
+    component: Configurations,
     layout: "/admin",
   },
   {
