@@ -791,7 +791,10 @@ class InflowsProvider extends Component {
       if (day === 6 || day === 0) {
         // weekends and peak season
         // only generate if there is a spillage
+        // Ezulwini
         this.populateScheduleWeekEndOffPeak(day);
+
+        // Edwaleni & Maguduza
 
         // maguga
         this.populateMagugaWeekDaySchedule(
@@ -810,7 +813,11 @@ class InflowsProvider extends Component {
         this.populateScheduleWeekEndOffPeak(day);
       } else {
         // weekday and off-peak season
-        this.populateScheduleWeekDayOffPeak(GS_2, Ferreira);
+        // Ezulwini
+        this.populateScheduleWeekDayEzulwinOffPeakSeason(GS_2, Ferreira);
+        // Edwaleni & Edwaleni
+        this.populateEdwaleniWeekDayOffPeakSchedule(GS_2, Ferreira);
+        // Maguga
         this.populateMagugaWeekDaySchedule(
           Regulating_Weir,
           Irrigation_Flow,
@@ -819,6 +826,140 @@ class InflowsProvider extends Component {
       }
     }
     this.calcSum();
+  };
+  /**
+   * edwaleni & maguduza
+   * @param {*} GS_2
+   * @param {*} Ferreira
+   */
+  populateEdwaleniWeekDayOffPeakSchedule = async (GS_2, Ferreira) => {
+    /**
+     * 1. Calculate water available for the whole day
+     * 2. Calculate Water needed for edwaleni peak period full load
+     * 3. If water is left, priotirize standard before peak
+     * 4. If water is left, run the entire standard: try 3 - 5 MW
+     * 5. If less water try 1.5MW and add each until all are added
+     * 6. Move to off peak
+     */
+
+    let generatedSchedule = this.state.currentSchedule;
+    // 1.
+    let availableWater = Math.round(this.calcTotalDailyFlow(GS_2 + Ferreira));
+    console.log(`\n edwaleni and maguduza ===========start======`);
+    console.log("availableWater", availableWater);
+    // 2.
+    const peakFullLoadWater = Math.round(
+      this.calcEdwaleniPeakFullLoadWater(5, 9.6, 5)
+    );
+    console.log("peakFullLoadWater", peakFullLoadWater);
+    console.log("avaialble water before peak full load", availableWater);
+    console.log("----end of peak---");
+    availableWater = availableWater - peakFullLoadWater;
+    console.log("after peak full load", availableWater);
+
+    if (availableWater >= 0) {
+      generatedSchedule = this.state.utils.methods.periodGen(
+        this.state.currentSchedule,
+        "Peak",
+        "14.6",
+        "EDWALENI"
+      );
+      generatedSchedule = this.state.utils.methods.periodGen(
+        this.state.currentSchedule,
+        "Peak",
+        "5.6",
+        "MAGUDUZA"
+      );
+    }
+    // 3.
+    const standardBeforePeakWater = Math.round(
+      this.calcEdwaleniPeakFullLoadWater(2, 9.6, 5)
+    );
+    availableWater = availableWater - standardBeforePeakWater;
+    console.log(
+      "water needed for standardBeforePeak 2 hours",
+      standardBeforePeakWater
+    );
+    console.log(
+      "water left after standardBeforePeak 2 hours: ",
+      availableWater
+    );
+
+    if (availableWater >= 0) {
+      generatedSchedule = this.state.utils.methods.hourlyGen(
+        this.state.currentSchedule,
+        ["6:00  -  7:00", "17:00  -  18:00"],
+        "14.6",
+        "EDWALENI"
+      );
+      generatedSchedule = this.state.utils.methods.hourlyGen(
+        this.state.currentSchedule,
+        ["6:00  -  7:00", "17:00  -  18:00"],
+        "5.6",
+        "MAGUDUZA"
+      );
+    }
+
+    // 4.
+    let cummulatedStandardPower = 0;
+
+    for (let power = 5; power > 2; power--) {
+      let standardBigSetWater = Math.round(
+        this.calcEdwaleniPeakFullLoadWater(7, 0, power)
+      );
+      console.log(
+        `water needed to run at ${power} MW for the rest of standard:${standardBigSetWater}`
+      );
+      console.log(`available water : ${availableWater}`);
+      if (availableWater - standardBigSetWater >= 0) {
+        cummulatedStandardPower = power;
+        availableWater = availableWater - standardBigSetWater;
+        console.log(`available water after ${power} : ${availableWater}`);
+        break;
+      }
+    }
+
+    // 5.
+
+    let standardSmallSetWater = Math.round(
+      this.calcEdwaleniPeakFullLoadWater(7, 0, 2.4)
+    );
+    console.log("water needed by smallset", standardSmallSetWater);
+    let smallSetsPowerSum = 0;
+    for (let index = 1; index < 5; index++) {
+      if (availableWater < standardSmallSetWater) {
+        break;
+      }
+      smallSetsPowerSum = 2.4 * index;
+      availableWater = availableWater - standardSmallSetWater;
+    }
+    cummulatedStandardPower = cummulatedStandardPower + smallSetsPowerSum;
+
+    // standard generation
+    generatedSchedule = this.state.utils.methods.hourlyGen(
+      this.state.currentSchedule,
+      [
+        "10:00  -  11:00",
+        "11:00  -  12:00",
+        "12:00  -  13:00",
+        "13:00  -  14:00",
+        "14:00  -  15:00",
+        "15:00  -  16:00",
+        "16:00  -  17:00",
+      ],
+      cummulatedStandardPower,
+      "EDWALENI"
+    );
+    console.log("----end of standard---");
+
+    console.log("availableWater", availableWater);
+    console.log(`edwaleni and maguduza ===========end======`);
+
+    // calculate sum per hour periods
+    generatedSchedule = this.state.utils.methods.calcWeekDaySum(
+      generatedSchedule
+    );
+    await this.setState({ currentSchedule: generatedSchedule });
   };
   populateScheduleWeekEndOffPeak = async (day) => {
     let waterConsumed = 0;
@@ -912,7 +1053,7 @@ class InflowsProvider extends Component {
     this.updateSummary("Final Dam Level(%)", finalDamVolume);
     await this.setState({ currentSchedule: generatedSchedule });
   };
-  populateScheduleWeekDayOffPeak = async (GS_2, Ferreira) => {
+  populateScheduleWeekDayEzulwinOffPeakSeason = async (GS_2, Ferreira) => {
     const {
       PEAK,
       STANDARD,
@@ -971,53 +1112,9 @@ class InflowsProvider extends Component {
     this.updateSummary("Water Used (mil. m³)", waterConsumed);
     this.updateSummary("Final Dam Level(%)", finalDamVolume);
 
-    let waterLeft = 0;
-    let waterForStandFullLoadBeforePeak = 0;
+    // let waterLeft = 0;
+    // let waterForStandFullLoadBeforePeak = 0;
     // Edwaleni & Maguduza
-    /**
-     * 1. calculate availabe water
-     * 2. calculate water needed for peak full load
-     * 3. find water left ^
-     * 4. if water is later the standard hours before each of the peak periods should take priority
-     * Power =
-     */
-
-    // 1. Calculate water available => m³/s * 60 min /hr * 60 s/min * 24 hr
-    let waterAvailable = (GS_2 + Ferreira) * 24 * 60 * 60;
-
-    // 2. calculate water needed for peak full load => 85500
-    let peakFullLoadWater = this.calcEdwFullLoadWater(5);
-    console.log("water avalable " + waterAvailable);
-    console.log("peak full water " + peakFullLoadWater);
-    if (waterAvailable > peakFullLoadWater) {
-      generatedSchedule = this.state.utils.methods.edwaleniPeakFullLoad(
-        generatedSchedule
-      );
-      generatedSchedule = this.state.utils.methods.maguduzaPeakFullLoad(
-        generatedSchedule
-      );
-      //  3. find water left
-      waterLeft = waterAvailable - peakFullLoadWater;
-      console.log("water left after peak generation " + waterLeft);
-    }
-    // 4. calculate water needed for the two standard hours before peak
-    waterForStandFullLoadBeforePeak = this.calcEdwFullLoadWater(2);
-    console.log("water needed for 2hrs " + waterForStandFullLoadBeforePeak);
-
-    if (waterLeft > waterForStandFullLoadBeforePeak) {
-      generatedSchedule = this.state.utils.methods.stationPeriodGen(
-        generatedSchedule,
-        ["6:00  -  7:00", "10:00  -  11:00"],
-        "14.6",
-        "EDWALENI"
-      );
-      //  5. find water left after two standard hours before peak
-      waterLeft = waterLeft - waterForStandFullLoadBeforePeak;
-      console.log(
-        "water left after two standard hours before peak " + waterLeft
-      );
-    }
-
     // const edwalwniSum = GS_2 + Ferreira;
     // if (edwalwniSum > 8) {
     //   generatedSchedule = this.state.utils.methods.edwaleniPeakFullLoad(
@@ -1043,8 +1140,7 @@ class InflowsProvider extends Component {
     //     generatedSchedule
     //   );
     // }
-
-    // // calculate sum per hour periods
+    // calculate sum per hour periods
     generatedSchedule = this.state.utils.methods.calcWeekDaySum(
       generatedSchedule
     );
@@ -1114,24 +1210,24 @@ class InflowsProvider extends Component {
       Maguga_Downstream_Wear_Limit
     );
 
-    const irrigationVolume = this.calcDischargedWeirWater(Irrigation_Flow);
+    const irrigationVolume = this.calcTotalDailyFlow(Irrigation_Flow);
     const waterConsumedEachSet = this.calcWaterConsumedByMagugaSetsFullLoad();
-
+    // 1.
     const availableWater = finalVolume - (currentVolume - irrigationVolume);
-
-    console.log("current volume", currentVolume);
-    console.log("final volume", finalVolume);
-    console.log("water needed for irrigation", irrigationVolume);
-    console.log("available water", availableWater);
     let generatedSchedule = this.state.currentSchedule;
+    // 2.
     const availableHours = parseFloat(availableWater / waterConsumedEachSet);
-    console.log("available hours", availableHours);
+    // 3.
     generatedSchedule = this.state.utils.methods.hourlyGenWithLimit(
       generatedSchedule,
       this.state.utils.methods.magugaWeekDayPriority(),
       "20",
       "MAGUGA",
       availableHours
+    );
+    // calculate sum per hour periods
+    generatedSchedule = this.state.utils.methods.calcWeekDaySum(
+      generatedSchedule
     );
     await this.setState({ currentSchedule: generatedSchedule });
   };
@@ -1140,7 +1236,7 @@ class InflowsProvider extends Component {
    * Calculate the volume of irrigation water that will be discharged from the regulating weir in 24hrs.
    * @param {*} Irrigation_Flow irrigation flow (m3/s)
    */
-  calcDischargedWeirWater = (Irrigation_Flow) => {
+  calcTotalDailyFlow = (Irrigation_Flow) => {
     return Irrigation_Flow * 24 * 60 * 60;
   };
 
@@ -1154,6 +1250,34 @@ class InflowsProvider extends Component {
     const waterConsumed = 60 * 60 * 10 * (ratedFlowOne + ratedFlowTwo);
 
     return waterConsumed;
+  };
+
+  calcEdwaleniPeakFullLoadWater = (hours, smallSetsPower, bigSetPower) => {
+    const ratedFlowSmall = parseFloat(
+      this.state.edwaleniPS.Genarators[0].Rated_Flow
+    );
+    const ratedFlowBig = parseFloat(
+      this.state.edwaleniPS.Genarators[1].Rated_Flow
+    );
+    // 8hrs x 60sec x 60 min x 9.6MW * rated flow
+    const waterConsumedByAllSmallSets = this.calWaterConsumedByAnyMachine(
+      hours,
+      smallSetsPower,
+      ratedFlowSmall
+    );
+
+    // 8hrs x 60sec x 60 min x 5MW * rated flow
+    const waterConsumedByBig = this.calWaterConsumedByAnyMachine(
+      hours,
+      bigSetPower,
+      ratedFlowBig
+    );
+
+    return waterConsumedByAllSmallSets + waterConsumedByBig;
+  };
+
+  calWaterConsumedByAnyMachine = (hours, power, ratedFlow) => {
+    return 3600 * hours * power * ratedFlow;
   };
   calcSum = async () => {
     let generatedSchedule = this.state.currentSchedule;
