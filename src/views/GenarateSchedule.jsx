@@ -32,6 +32,7 @@ class GenerateSchedule extends Component {
       Luphohlo_Daily_Level: "",
       Irrigation_Flow: "",
       Regulating_Weir: "",
+      Maguga_Downstream_Wear_Limit: "",
       Ferreira: "",
       GS_15: "",
       GS_2: "",
@@ -47,6 +48,7 @@ class GenerateSchedule extends Component {
         "GS_2",
         "Irrigation_Flow",
         "Regulating_Weir",
+        "Maguga_Downstream_Wear_Limit",
       ],
     };
   }
@@ -61,6 +63,18 @@ class GenerateSchedule extends Component {
   componentDidMount = () => {
     this.context.handleForecastDateChange(this.state.startDate);
   };
+  componentDidUpdate(prevProps) {
+    // Typical usage (don't forget to compare props):
+    if (
+      !this.state.Maguga_Downstream_Wear_Limit &&
+      Object.keys(this.context.settings).length !== 0
+    ) {
+      this.setState({
+        Maguga_Downstream_Wear_Limit: this.context.settings
+          .Maguga_Downstream_Wear_Limit,
+      });
+    }
+  }
 
   handleInputChange = async (e) => {
     await this.setState({
@@ -180,8 +194,8 @@ class GenerateSchedule extends Component {
     e.preventDefault();
   };
   render() {
-    const { date } = this.context;
-    const { disabled } = this.state;
+    const { date, loading } = this.context;
+    const { disabled, Maguga_Downstream_Wear_Limit } = this.state;
     return (
       <>
         <div className="content">
@@ -335,7 +349,7 @@ class GenerateSchedule extends Component {
                       </Col>
                       <Col className="pr-md-1" md="3">
                         <FormGroup>
-                          <label>Regulating Weir</label>
+                          <label>Weir Daily Level</label>
                           <Input
                             id="Regulating_Weir"
                             required
@@ -343,6 +357,20 @@ class GenerateSchedule extends Component {
                             type="number"
                             // onBlur={this.gsOnfocusOut}
                             value={this.state.Regulating_Weir}
+                            onChange={this.handleInputChange}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col className="pr-md-1" md="3">
+                        <FormGroup>
+                          <label>Weir Limit</label>
+                          <Input
+                            id="Maguga_Downstream_Wear_Limit"
+                            required
+                            placeholder="m.a.s.l"
+                            type="number"
+                            // onBlur={this.gsOnfocusOut}
+                            value={Maguga_Downstream_Wear_Limit}
                             onChange={this.handleInputChange}
                           />
                         </FormGroup>
@@ -365,6 +393,7 @@ class GenerateSchedule extends Component {
                     color="info"
                     type="button"
                     onClick={this.loadPreviousInflows}
+                    disabled={loading}
                   >
                     Load Previous Inflows
                   </Button>

@@ -18,7 +18,7 @@ export default class DailySummary extends Component {
               <Row>
                 {summary.map((item, index) => {
                   return (
-                    <Col className="pr-md-1" md="3" key={index}>
+                    <Col className="pr-md-1" md="4" key={index}>
                       <label htmlFor="exampleInputEmail1">{item.text}</label>
                       <h5 className="title">{item.value}</h5>
                     </Col>

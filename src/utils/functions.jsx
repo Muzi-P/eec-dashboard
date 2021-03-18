@@ -160,8 +160,8 @@ const methods = {
       result = 219000;
     } else if (level >= 512.89 && level <= 512.99) {
       result = 225000;
-    } else if ((level = 513)) {
-      result = 225000;
+    } else if (level === 513) {
+      result = 227395;
     } else if (level >= 513.01 && level <= 513.13) {
       result = 238000;
     } else if (level >= 513.14 && level <= 513.25) {
@@ -180,6 +180,8 @@ const methods = {
       result = 300000;
     } else if (level >= 513.91 && level <= 513.99) {
       result = 288000;
+    } else if (level === 514) {
+      result = 306093;
     } else if (level >= 514.01 && level <= 514.1) {
       result = 313000;
     } else if (level >= 514.11 && level <= 514.2) {
@@ -200,6 +202,8 @@ const methods = {
       result = 400000;
     } else if (level >= 514.91 && level <= 514.99) {
       result = 413000;
+    } else if (level === 515) {
+      result = 415352;
     } else if (level >= 515.01 && level <= 515.1) {
       result = 425000;
     } else if (level >= 515.11 && level <= 515.2) {
@@ -220,6 +224,8 @@ const methods = {
       result = 538000;
     } else if (level >= 515.91 && level <= 515.99) {
       result = 550000;
+    } else if (level === 516) {
+      result = 552853;
     } else if (level >= 516.01 && level <= 516.1) {
       result = 569000;
     } else if (level >= 516.11 && level <= 516.2) {
@@ -240,6 +246,8 @@ const methods = {
       result = 694000;
     } else if (level >= 516.91 && level <= 516.99) {
       result = 710000;
+    } else if (level === 517) {
+      result = 711039;
     } else if (level >= 517.01 && level <= 517.1) {
       result = 725000;
     } else if (level >= 517.11 && level <= 517.2) {
@@ -260,6 +268,8 @@ const methods = {
       result = 875000;
     } else if (level >= 517.91 && level <= 517.99) {
       result = 888000;
+    } else if (level === 518) {
+      result = 890193;
     } else if (level >= 518.01 && level <= 518.1) {
       result = 913000;
     } else if (level >= 518.21 && level <= 518.3) {
@@ -268,6 +278,8 @@ const methods = {
       result = 969000;
     } else if (level >= 518.41 && level <= 518.49) {
       result = 978000;
+    } else if (level > 518.5) {
+      result = 989000;
     }
 
     return result;

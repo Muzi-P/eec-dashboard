@@ -111,6 +111,10 @@ class InflowsProvider extends Component {
           text: "Final Dam Level(%)",
           value: "",
         },
+        {
+          text: "Maguga Weir Limit(m.a.s.l)",
+          value: "",
+        },
       ],
     };
   }
@@ -137,10 +141,12 @@ class InflowsProvider extends Component {
    * @description get all inflows
    */
   getAllInflows = () => {
+    this.setState({ loading: true });
     axios
       .get(`${process.env.REACT_APP_API}/inflows`, this.state.config)
       .then((res) => {
         this.setState({ inflows: res.data });
+        this.setState({ loading: false });
         this.getAllYears(res.data);
       })
       .catch(() => {
@@ -563,6 +569,7 @@ class InflowsProvider extends Component {
       model,
       Regulating_Weir,
       Irrigation_Flow,
+      Maguga_Downstream_Wear_Limit,
     } = state;
     let selectedModel = this.state.models.filter(
       (models) => models.Model_Name === model
@@ -580,6 +587,10 @@ class InflowsProvider extends Component {
     };
     await this.postInflow(inflow);
     this.updateSummary("Current Model", model);
+    this.updateSummary(
+      "Maguga Weir Limit(m.a.s.l)",
+      Maguga_Downstream_Wear_Limit
+    );
     this.updateSummary("Initial Dam Level (m.a.s.l)", Luphohlo_Daily_Level);
     this.updateSummary(
       "Current Month",
@@ -653,7 +664,8 @@ class InflowsProvider extends Component {
       parseFloat(GS_2),
       parseFloat(Ferreira),
       parseFloat(Regulating_Weir),
-      parseFloat(Irrigation_Flow)
+      parseFloat(Irrigation_Flow),
+      parseFloat(Maguga_Downstream_Wear_Limit)
     );
     this.storeSchedule(startDate);
   };
@@ -770,7 +782,8 @@ class InflowsProvider extends Component {
     GS_2,
     Ferreira,
     Regulating_Weir,
-    Irrigation_Flow
+    Irrigation_Flow,
+    Maguga_Downstream_Wear_Limit
   ) => {
     const month = startDate.getMonth();
     const day = startDate.getDay();
@@ -781,7 +794,11 @@ class InflowsProvider extends Component {
         this.populateScheduleWeekEndOffPeak(day);
 
         // maguga
-        this.populateMagugaWeekDaySchedule(Regulating_Weir, Irrigation_Flow);
+        this.populateMagugaWeekDaySchedule(
+          Regulating_Weir,
+          Irrigation_Flow,
+          Maguga_Downstream_Wear_Limit
+        );
       } else {
         // weekday and peak season
         this.populateScheduleWeekDayPeakSeason(Luphohlo_Daily_Level);
@@ -794,7 +811,11 @@ class InflowsProvider extends Component {
       } else {
         // weekday and off-peak season
         this.populateScheduleWeekDayOffPeak(GS_2, Ferreira);
-        this.populateMagugaWeekDaySchedule(Regulating_Weir, Irrigation_Flow);
+        this.populateMagugaWeekDaySchedule(
+          Regulating_Weir,
+          Irrigation_Flow,
+          Maguga_Downstream_Wear_Limit
+        );
       }
     }
     this.calcSum();
@@ -1014,23 +1035,36 @@ class InflowsProvider extends Component {
    * @param {*} Regulating_Weir maguga regulating weir
    * @param {*} Irrigation_Flow maguga irrigation flow
    */
-  populateMagugaWeekDaySchedule = async (Regulating_Weir, Irrigation_Flow) => {
+  populateMagugaWeekDaySchedule = async (
+    Regulating_Weir,
+    Irrigation_Flow,
+    Maguga_Downstream_Wear_Limit
+  ) => {
     /**
      * 1. get available water
+     *  ***Final water  -  (current weir water - water needed for irrigation)
      * 2. get number of hours required to replace water
      * 3. Distribute the number of hours obtained by giving priority to peak periods.
      */
+    const currentVolume = this.state.utils.methods.magugaWeirLevelToVol(
+      Regulating_Weir
+    );
+    const finalVolume = this.state.utils.methods.magugaWeirLevelToVol(
+      Maguga_Downstream_Wear_Limit
+    );
 
-    const availableWater = this.calcDischargedWeirWater(Irrigation_Flow);
+    const irrigationVolume = this.calcDischargedWeirWater(Irrigation_Flow);
     const waterConsumedEachSet = this.calcWaterConsumedByMagugaSetsFullLoad();
-    console.log(`available water ${availableWater}`);
+
+    const availableWater = finalVolume - (currentVolume - irrigationVolume);
+
+    console.log("current volume", currentVolume);
+    console.log("final volume", finalVolume);
+    console.log("water needed for irrigation", irrigationVolume);
+    console.log("available water", availableWater);
     let generatedSchedule = this.state.currentSchedule;
     const availableHours = parseFloat(availableWater / waterConsumedEachSet);
-    console.log(`available hours ${availableHours}`);
-    console.log(
-      `water consumed
-        ${this.calcWaterConsumedByMagugaSetsFullLoad() * availableHours}`
-    );
+    console.log("available hours", availableHours);
     generatedSchedule = this.state.utils.methods.hourlyGenWithLimit(
       generatedSchedule,
       this.state.utils.methods.magugaWeekDayPriority(),
@@ -1038,30 +1072,6 @@ class InflowsProvider extends Component {
       "MAGUGA",
       availableHours
     );
-    // if (availableHours > 5) {
-    //   generatedSchedule = this.state.utils.methods.periodGen(
-    //     generatedSchedule,
-    //     "Peak",
-    //     "20",
-    //     "MAGUGA"
-    //   );
-    // }
-    // if (availableHours > 6) {
-    //   generatedSchedule = this.state.utils.methods.hourlyGen(
-    //     generatedSchedule,
-    //     ["6:00  -  7:00"],
-    //     "20",
-    //     "MAGUGA"
-    //   );
-    // }
-    // if (availableHours > 7) {
-    //   generatedSchedule = this.state.utils.methods.hourlyGen(
-    //     generatedSchedule,
-    //     ["17:00  -  18:00"],
-    //     "20",
-    //     "MAGUGA"
-    //   );
-    // }
     await this.setState({ currentSchedule: generatedSchedule });
   };
 
