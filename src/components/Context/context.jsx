@@ -849,7 +849,7 @@ class InflowsProvider extends Component {
     console.log("availableWater", availableWater);
     // 2.
     const peakFullLoadWater = Math.round(
-      this.calcEdwaleniPeakFullLoadWater(5, 9.6, 5)
+      this.calcEdwaleniLoadWater(5, 9.6, 5)
     );
     console.log("peakFullLoadWater", peakFullLoadWater);
     console.log("avaialble water before peak full load", availableWater);
@@ -873,7 +873,7 @@ class InflowsProvider extends Component {
     }
     // 3.
     const standardBeforePeakWater = Math.round(
-      this.calcEdwaleniPeakFullLoadWater(2, 9.6, 5)
+      this.calcEdwaleniLoadWater(2, 9.6, 5)
     );
     availableWater = availableWater - standardBeforePeakWater;
     console.log(
@@ -899,45 +899,9 @@ class InflowsProvider extends Component {
         "MAGUDUZA"
       );
     }
-
-    // 4.
-    let cummulatedStandardPower = 0;
-
-    for (let power = 5; power > 2; power--) {
-      let standardBigSetWater = Math.round(
-        this.calcEdwaleniPeakFullLoadWater(7, 0, power)
-      );
-      console.log(
-        `water needed to run at ${power} MW for the rest of standard:${standardBigSetWater}`
-      );
-      console.log(`available water : ${availableWater}`);
-      if (availableWater - standardBigSetWater >= 0) {
-        cummulatedStandardPower = power;
-        availableWater = availableWater - standardBigSetWater;
-        console.log(`available water after ${power} : ${availableWater}`);
-        break;
-      }
-    }
-
-    // 5.
-
-    let standardSmallSetWater = Math.round(
-      this.calcEdwaleniPeakFullLoadWater(7, 0, 2.4)
-    );
-    console.log("water needed by smallset", standardSmallSetWater);
-    let smallSetsPowerSum = 0;
-    for (let index = 1; index < 5; index++) {
-      if (availableWater < standardSmallSetWater) {
-        break;
-      }
-      smallSetsPowerSum = 2.4 * index;
-      availableWater = availableWater - standardSmallSetWater;
-    }
-    cummulatedStandardPower = cummulatedStandardPower + smallSetsPowerSum;
-
-    // standard generation
-    generatedSchedule = this.state.utils.methods.hourlyGen(
-      this.state.currentSchedule,
+    let result = this.distributeEdwaleniPower(
+      generatedSchedule,
+      availableWater,
       [
         "10:00  -  11:00",
         "11:00  -  12:00",
@@ -947,10 +911,81 @@ class InflowsProvider extends Component {
         "15:00  -  16:00",
         "16:00  -  17:00",
       ],
-      cummulatedStandardPower,
-      "EDWALENI"
+      "Standard"
     );
-    console.log("----end of standard---");
+
+    generatedSchedule = result.generatedSchedule;
+    availableWater = result.availableWater;
+
+    result = this.distributeEdwaleniPower(
+      generatedSchedule,
+      availableWater,
+      [
+        "20:00  -  21:00",
+        "21:00 -  22:00",
+        "22:00  - 23:00",
+        "23:00  -  00:00",
+        "0:00  -  1:00",
+        "1:00  -  2:00",
+        "2:00  -  3:00",
+        "3:00  -  4:00",
+        "4:00  -  5:00",
+        "5:00  -  6:00",
+      ],
+      "Off-Peak"
+    );
+    generatedSchedule = result.generatedSchedule;
+    availableWater = result.availableWater;
+    // 4.
+    // let cummulatedStandardPower = 0;
+
+    // for (let power = 5; power > 2; power--) {
+    //   let standardBigSetWater = Math.round(
+    //     this.calcEdwaleniLoadWater(7, 0, power)
+    //   );
+    //   console.log(
+    //     `water needed to run at ${power} MW for the rest of standard:${standardBigSetWater}`
+    //   );
+    //   console.log(`available water : ${availableWater}`);
+    //   if (availableWater - standardBigSetWater >= 0) {
+    //     cummulatedStandardPower = power;
+    //     availableWater = availableWater - standardBigSetWater;
+    //     console.log(`available water after ${power} : ${availableWater}`);
+    //     break;
+    //   }
+    // }
+
+    // 5.
+
+    // let standardSmallSetWater = Math.round(
+    //   this.calcEdwaleniLoadWater(7, 0, 2.4)
+    // );
+    // console.log("water needed by smallset", standardSmallSetWater);
+    // let smallSetsPowerSum = 0;
+    // for (let index = 1; index < 5; index++) {
+    //   if (availableWater < standardSmallSetWater) {
+    //     break;
+    //   }
+    //   smallSetsPowerSum = 2.4 * index;
+    //   availableWater = availableWater - standardSmallSetWater;
+    // }
+    // cummulatedStandardPower = cummulatedStandardPower + smallSetsPowerSum;
+
+    // // standard generation
+    // generatedSchedule = this.state.utils.methods.hourlyGen(
+    //   this.state.currentSchedule,
+    //   [
+    //     "10:00  -  11:00",
+    //     "11:00  -  12:00",
+    //     "12:00  -  13:00",
+    //     "13:00  -  14:00",
+    //     "14:00  -  15:00",
+    //     "15:00  -  16:00",
+    //     "16:00  -  17:00",
+    //   ],
+    //   cummulatedStandardPower,
+    //   "EDWALENI"
+    // );
 
     console.log("availableWater", availableWater);
     console.log(`edwaleni and maguduza ===========end======`);
@@ -1252,7 +1287,7 @@ class InflowsProvider extends Component {
     return waterConsumed;
   };
 
-  calcEdwaleniPeakFullLoadWater = (hours, smallSetsPower, bigSetPower) => {
+  calcEdwaleniLoadWater = (hours, smallSetsPower, bigSetPower) => {
     const ratedFlowSmall = parseFloat(
       this.state.edwaleniPS.Genarators[0].Rated_Flow
     );
@@ -1384,7 +1419,60 @@ class InflowsProvider extends Component {
     };
     await this.setState({ ezulwini });
   };
+  distributeEdwaleniPower = (
+    generatedSchedule,
+    availableWater,
+    hours,
+    periodName
+  ) => {
+    let cummulatedPower = 0;
 
+    for (let power = 5; power > 2; power--) {
+      let bigSetWater = Math.round(
+        this.calcEdwaleniLoadWater(hours.length, 0, power)
+      );
+      console.log(
+        `water needed to run at ${power} MW for the rest of ${periodName}:${bigSetWater}`
+      );
+      console.log(`available water : ${availableWater}`);
+      if (availableWater - bigSetWater >= 0) {
+        cummulatedPower = power;
+        availableWater = availableWater - bigSetWater;
+        console.log(`available water after ${power} : ${availableWater}`);
+        break;
+      }
+    }
+
+    // 5.
+
+    let SmallSetWater = Math.round(
+      this.calcEdwaleniLoadWater(hours.length, 0, 2.4)
+    );
+    console.log("water needed by smallset", SmallSetWater);
+    let smallSetsPowerSum = 0;
+    for (let index = 1; index < 5; index++) {
+      if (availableWater < SmallSetWater) {
+        break;
+      }
+      smallSetsPowerSum = 2.4 * index;
+      availableWater = availableWater - SmallSetWater;
+      console.log(
+        `available water after (${index}) 2.4 Mw set : ${availableWater}`
+      );
+    }
+    cummulatedPower = cummulatedPower + smallSetsPowerSum;
+
+    // standard generation
+    generatedSchedule = this.state.utils.methods.hourlyGen(
+      this.state.currentSchedule,
+      hours,
+      cummulatedPower,
+      "EDWALENI"
+    );
+    console.log(`----end of ${periodName}---`);
+
+    return { generatedSchedule, availableWater };
+  };
   calcEzWater = (watts, hours) =>
     watts *
     hours *
