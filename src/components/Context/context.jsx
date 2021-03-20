@@ -636,7 +636,7 @@ class InflowsProvider extends Component {
       if (day === 6 || day === 0) {
         // weekends off-peak season
         // only generate if dam is above 90%
-        limit = 1014.35;
+        limit = parseFloat(this.state.settings.Luphohlo_Weekend_Limit);
         volume = this.state.utils.methods.levelToVol(limit);
         await this.calculateDailyReq(
           parseFloat(GS_15),
@@ -797,24 +797,39 @@ class InflowsProvider extends Component {
         this.populateMagugaWeekDaySchedule(
           Regulating_Weir,
           Irrigation_Flow,
-          Maguga_Downstream_Wear_Limit
+          Maguga_Downstream_Wear_Limit,
+          this.state.utils.methods.magugaSatPriority
         );
       } else {
         // weekday and peak season
         this.populateScheduleWeekDayPeakSeason(Luphohlo_Daily_Level);
+        this.populateMagugaWeekDaySchedule(
+          Regulating_Weir,
+          Irrigation_Flow,
+          Maguga_Downstream_Wear_Limit,
+          this.state.utils.methods.magugaWeekDayPriority
+        );
       }
     } else {
       if (day === 6 || day === 0) {
         // weekends off-peak season
         // only generate if dam is above 90%
         this.populateScheduleWeekEndOffPeak(day);
+        // maguga
+        this.populateMagugaWeekDaySchedule(
+          Regulating_Weir,
+          Irrigation_Flow,
+          Maguga_Downstream_Wear_Limit,
+          this.state.utils.methods.magugaSatPriority
+        );
       } else {
         // weekday and off-peak season
         this.populateScheduleWeekDayOffPeak(GS_2, Ferreira);
         this.populateMagugaWeekDaySchedule(
           Regulating_Weir,
           Irrigation_Flow,
-          Maguga_Downstream_Wear_Limit
+          Maguga_Downstream_Wear_Limit,
+          this.state.utils.methods.magugaWeekDayPriority
         );
       }
     }
@@ -1038,7 +1053,8 @@ class InflowsProvider extends Component {
   populateMagugaWeekDaySchedule = async (
     Regulating_Weir,
     Irrigation_Flow,
-    Maguga_Downstream_Wear_Limit
+    Maguga_Downstream_Wear_Limit,
+    hoursPriority
   ) => {
     /**
      * 1. get available water
@@ -1067,7 +1083,7 @@ class InflowsProvider extends Component {
     console.log("available hours", availableHours);
     generatedSchedule = this.state.utils.methods.hourlyGenWithLimit(
       generatedSchedule,
-      this.state.utils.methods.magugaWeekDayPriority(),
+      hoursPriority(),
       "20",
       "MAGUGA",
       availableHours
