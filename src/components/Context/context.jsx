@@ -914,9 +914,9 @@ class InflowsProvider extends Component {
     }
 
     // calculate sum per hour periods
-    generatedSchedule = this.state.utils.methods.calcWeekDaySum(
-      generatedSchedule
-    );
+    // generatedSchedule = this.state.utils.methods.calcWeekDaySum(
+    //   generatedSchedule
+    // );
 
     let finalDamVolume =
       DAILY_LUPHOHLO_INFLOW + INITIAL_LUPHOHLO_DAM_VOLUME - waterConsumed;
@@ -1013,9 +1013,9 @@ class InflowsProvider extends Component {
       );
     }
     // calculate sum per hour periods
-    generatedSchedule = this.state.utils.methods.calcWeekDaySum(
-      generatedSchedule
-    );
+    // generatedSchedule = this.state.utils.methods.calcWeekDaySum(
+    //   generatedSchedule
+    // );
     await this.setState({ currentSchedule: generatedSchedule });
   };
   populateScheduleWeekDayPeakSeason = async (Luphohlo_Daily_Level) => {
@@ -1039,9 +1039,9 @@ class InflowsProvider extends Component {
       generatedSchedule
     );
     // calculate sum per hour periods
-    generatedSchedule = this.state.utils.methods.calcWeekDaySum(
-      generatedSchedule
-    );
+    // generatedSchedule = this.state.utils.methods.calcWeekDaySum(
+    //   generatedSchedule
+    // );
 
     await this.setState({ currentSchedule: generatedSchedule });
   };
@@ -1113,6 +1113,11 @@ class InflowsProvider extends Component {
   calcSum = async () => {
     let generatedSchedule = this.state.currentSchedule;
     generatedSchedule = this.state.utils.methods.calcSum(generatedSchedule);
+
+    // calculate sum per hour periods
+    generatedSchedule = this.state.utils.methods.calcWeekDaySum(
+      generatedSchedule
+    );
     await this.setState({ currentSchedule: generatedSchedule });
   };
   calculateDailyReq = async (
