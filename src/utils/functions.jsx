@@ -144,7 +144,7 @@ const methods = {
     let result;
     if (level < 512) {
       result = 0;
-    } else if (level >= 512.1 && level <= 512.13) {
+    } else if (level >= 512 && level <= 512.13) {
       result = 175000;
     } else if (level >= 512.14 && level <= 512.25) {
       result = 188000;

@@ -1071,8 +1071,8 @@ class InflowsProvider extends Component {
 
     const irrigationVolume = this.calcDischargedWeirWater(Irrigation_Flow);
     const waterConsumedEachSet = this.calcWaterConsumedByMagugaSetsFullLoad();
-
-    const availableWater = finalVolume - (currentVolume - irrigationVolume);
+    //  inflows = limit - current + outflows
+    const availableWater = finalVolume - currentVolume + irrigationVolume;
 
     console.log("current volume", currentVolume);
     console.log("final volume", finalVolume);
