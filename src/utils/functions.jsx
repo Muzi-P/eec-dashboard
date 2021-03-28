@@ -736,14 +736,27 @@ const methods = {
    * @param {Number} availableHours available hours
    */
   hourlyGenWithLimit: (schedule, periods, power, station, availableHours) => {
-    // for (let index = 0; index < periods.length; index++) {
-    //   schedule.forEach((item) => {
-    //     if (item.Time === periods[index]) item[station] = power;
-    //   });
-    // }
+    for (let index = 0; index < periods.length; index++) {
+      if (availableHours < 1) {
+        schedule = methods.handleMagugaHalfGen(
+          availableHours.toFixed(1),
+          periods,
+          station,
+          index,
+          schedule
+        );
+        break;
+      }
+      schedule.forEach((item) => {
+        if (item.Time === periods[index]) item[station] = power;
+      });
+      availableHours--;
+    }
 
+    /*
     periods.forEach((timePeriod) => {
       if (availableHours < 0) {
+        console.log("here");
         return false;
       }
       schedule.forEach((item) => {
@@ -751,7 +764,8 @@ const methods = {
       });
       availableHours--;
     });
-
+    console.log(availableHours);
+*/
     return schedule;
   },
 
@@ -810,6 +824,24 @@ const methods = {
       "4:00  -  5:00",
       "5:00  -  6:00",
     ];
+  },
+
+  handleMagugaHalfGen: (hourFraction, periods, station, index, schedule) => {
+    hourFraction = parseInt(hourFraction.split(".")[1]);
+    let power = 0;
+
+    if (hourFraction === 0) {
+      return schedule;
+    } else if (hourFraction >= 3 && hourFraction <= 8) {
+      power = 10;
+    } else if (hourFraction > 8) {
+      power = 20;
+    }
+    schedule.forEach((item) => {
+      if (item.Time === periods[index]) item[station] = power;
+    });
+
+    return schedule;
   },
 };
 
