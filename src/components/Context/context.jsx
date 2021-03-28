@@ -863,9 +863,7 @@ class InflowsProvider extends Component {
     console.log(`\n edwaleni and maguduza ===========start======`);
     console.log("availableWater", availableWater);
     // 2.
-    const peakFullLoadWater = Math.round(
-      this.calcEdwaleniLoadWater(5, 9.6, 5)
-    );
+    const peakFullLoadWater = Math.round(this.calcEdwaleniLoadWater(5, 9.6, 5));
     console.log("peakFullLoadWater", peakFullLoadWater);
     console.log("avaialble water before peak full load", availableWater);
     console.log("----end of peak---");
@@ -1003,7 +1001,7 @@ class InflowsProvider extends Component {
     // );
 
     console.log("availableWater", availableWater);
-    console.log(`edwaleni and maguduza ===========end======`);
+    console.log(` edwaleni and maguduza ===========end======`);
 
     // calculate sum per hour periods
     generatedSchedule = this.state.utils.methods.calcWeekDaySum(
@@ -1265,7 +1263,7 @@ class InflowsProvider extends Component {
     const waterConsumedEachSet = this.calcWaterConsumedByMagugaSetsFullLoad();
     //  inflows = limit - current + outflows
     const availableWater = finalVolume - currentVolume + irrigationVolume;
-
+    console.log(`\n Maguga ===========start======`);
     console.log("current volume", currentVolume);
     console.log("final volume", finalVolume);
     console.log("water needed for irrigation", irrigationVolume);
@@ -1273,6 +1271,7 @@ class InflowsProvider extends Component {
     let generatedSchedule = this.state.currentSchedule;
     // 2.
     const availableHours = parseFloat(availableWater / waterConsumedEachSet);
+    console.log("available hours", availableHours);
     // 3.
     generatedSchedule = this.state.utils.methods.hourlyGenWithLimit(
       generatedSchedule,
@@ -1286,6 +1285,7 @@ class InflowsProvider extends Component {
       generatedSchedule
     );
     await this.setState({ currentSchedule: generatedSchedule });
+    console.log(`Maguga ===========start======`);
   };
 
   /**
