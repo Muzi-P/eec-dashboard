@@ -610,6 +610,12 @@ class InflowsProvider extends Component {
     this.updateSummary("Initial Dam Level (%)", this.volumeToPerc(dayVolume));
     let volume;
 
+    // reset schedules
+
+    let generatedSchedule = this.state.currentSchedule;
+    generatedSchedule = this.state.utils.methods.allShutDown(generatedSchedule);
+    await this.setState({ currentSchedule: generatedSchedule });
+
     const month = startDate.getMonth();
     const day = startDate.getDay();
     if (month === 5 || month === 6 || month === 7) {
@@ -793,7 +799,8 @@ class InflowsProvider extends Component {
         // only generate if there is a spillage
         // Ezulwini
         this.populateScheduleWeekEndOffPeak(day);
-
+        // edwaleni same as off peak season
+        this.populateEdwaleniWeekendOffPeakSchedule(GS_2, Ferreira, day);
         // maguga
         this.populateMagugaWeekDaySchedule(
           Regulating_Weir,
@@ -804,6 +811,8 @@ class InflowsProvider extends Component {
       } else {
         // weekday and peak season
         this.populateScheduleWeekDayPeakSeason(Luphohlo_Daily_Level);
+        // Edwaleni same as off-peak season
+        this.populateEdwaleniWeekDayOffPeakSchedule(GS_2, Ferreira);
         this.populateMagugaWeekDaySchedule(
           Regulating_Weir,
           Irrigation_Flow,
@@ -816,6 +825,8 @@ class InflowsProvider extends Component {
         // weekends off-peak season
         // only generate if dam is above 90%
         this.populateScheduleWeekEndOffPeak(day);
+        // edwaleni
+        this.populateEdwaleniWeekendOffPeakSchedule(GS_2, Ferreira, day);
         // maguga
         this.populateMagugaWeekDaySchedule(
           Regulating_Weir,
@@ -827,7 +838,7 @@ class InflowsProvider extends Component {
         // weekday and off-peak season
         // Ezulwini
         this.populateScheduleWeekDayEzulwinOffPeakSeason(GS_2, Ferreira);
-        // Edwaleni & Edwaleni
+        // Edwaleni
         this.populateEdwaleniWeekDayOffPeakSchedule(GS_2, Ferreira);
         // Maguga
         this.populateMagugaWeekDaySchedule(
@@ -841,7 +852,7 @@ class InflowsProvider extends Component {
     this.calcSum();
   };
   /**
-   * edwaleni & maguduza
+   * edwaleni & maguduza weekday
    * @param {*} GS_2
    * @param {*} Ferreira
    */
@@ -875,12 +886,6 @@ class InflowsProvider extends Component {
         "14.6",
         "EDWALENI"
       );
-      generatedSchedule = this.state.utils.methods.periodGen(
-        this.state.currentSchedule,
-        "Peak",
-        "5.6",
-        "MAGUDUZA"
-      );
     }
     // 3.
     const standardBeforePeakWater = Math.round(
@@ -902,12 +907,6 @@ class InflowsProvider extends Component {
         ["6:00  -  7:00", "17:00  -  18:00"],
         "14.6",
         "EDWALENI"
-      );
-      generatedSchedule = this.state.utils.methods.hourlyGen(
-        this.state.currentSchedule,
-        ["6:00  -  7:00", "17:00  -  18:00"],
-        "5.6",
-        "MAGUDUZA"
       );
     }
     let result = this.distributeEdwaleniPower(
@@ -950,6 +949,219 @@ class InflowsProvider extends Component {
 
     console.log("availableWater", availableWater);
     console.log(` edwaleni and maguduza ===========end======`);
+
+    // calculate sum per hour periods
+    generatedSchedule = this.state.utils.methods.calcWeekDaySum(
+      generatedSchedule
+    );
+    await this.setState({ currentSchedule: generatedSchedule });
+  };
+  /**
+   * edwaleni & maguduza weekends
+   * @param {*} GS_2
+   * @param {*} Ferreira
+   */
+  populateEdwaleniWeekendOffPeakSchedule = async (GS_2, Ferreira, day) => {
+    if (day === 6) {
+      this.populateEdwaleniSatPeakSchedule(GS_2, Ferreira);
+    } else {
+      this.populateEdwaleniSunPeakSchedule(GS_2, Ferreira);
+    }
+  };
+  populateEdwaleniSatPeakSchedule = async (GS_2, Ferreira) => {
+    /**
+     * 1. Calculate water available for the whole day
+     * 2. Calculate Water needed for edwaleni standard period full load
+     * 3. If water is left, priotirize offpeaek before standard
+     * 4. If water is left, run the entire standard: try 3 - 5 MW
+     * 5. If less water try 1.5MW and add each until all are added
+     * 6. Move to off peak
+     */
+
+    let generatedSchedule = this.state.currentSchedule;
+    // 1.
+    let availableWater = Math.round(this.calcTotalDailyFlow(GS_2 + Ferreira));
+    console.log(`\n edwaleni and maguduza ===========start======`);
+    console.log("availableWater", availableWater);
+    // 2.
+    const standardFullLoadWater = Math.round(
+      this.calcEdwaleniLoadWater(7, 9.6, 5)
+    );
+    console.log("standardFullLoadWater", standardFullLoadWater);
+    console.log("avaialble water before standard full load", availableWater);
+    console.log("----end of standard---");
+    availableWater = availableWater - standardFullLoadWater;
+    console.log("after standard full load", availableWater);
+
+    if (availableWater >= 0) {
+      generatedSchedule = this.state.utils.methods.periodGen(
+        this.state.currentSchedule,
+        "Standard",
+        "14.6",
+        "EDWALENI"
+      );
+      generatedSchedule = this.state.utils.methods.periodGen(
+        this.state.currentSchedule,
+        "Standard",
+        "5.6",
+        "MAGUDUZA"
+      );
+    }
+    // 3.
+    const offPeakBeforeStandardWater = Math.round(
+      this.calcEdwaleniLoadWater(2, 9.6, 5)
+    );
+    availableWater = availableWater - offPeakBeforeStandardWater;
+    console.log(
+      "water needed for standardBeforePeak 2 hours",
+      offPeakBeforeStandardWater
+    );
+    console.log(
+      "water left after standardBeforePeak 2 hours: ",
+      availableWater
+    );
+
+    if (availableWater >= 0) {
+      generatedSchedule = this.state.utils.methods.hourlyGen(
+        this.state.currentSchedule,
+        ["6:00  -  7:00", "17:00  -  18:00"],
+        "14.6",
+        "EDWALENI"
+      );
+      generatedSchedule = this.state.utils.methods.hourlyGen(
+        this.state.currentSchedule,
+        ["6:00  -  7:00", "17:00  -  18:00"],
+        "5.6",
+        "MAGUDUZA"
+      );
+    }
+    let result = this.distributeEdwaleniPower(
+      generatedSchedule,
+      availableWater,
+      [
+        "12:00  -  13:00",
+        "13:00  -  14:00",
+        "14:00  -  15:00",
+        "15:00  -  16:00",
+        "16:00  -  17:00",
+        "20:00  -  21:00",
+        "21:00 -  22:00",
+        "22:00  - 23:00",
+        "23:00  -  00:00",
+        "0:00  -  1:00",
+        "1:00  -  2:00",
+        "2:00  -  3:00",
+        "3:00  -  4:00",
+        "4:00  -  5:00",
+        "5:00  -  6:00",
+      ],
+      "Off-Peak"
+    );
+
+    generatedSchedule = result.generatedSchedule;
+    availableWater = result.availableWater;
+    console.log("availableWater", availableWater);
+    console.log(` edwaleni ===========end======`);
+
+    // calculate sum per hour periods
+    generatedSchedule = this.state.utils.methods.calcWeekDaySum(
+      generatedSchedule
+    );
+    await this.setState({ currentSchedule: generatedSchedule });
+  };
+  populateEdwaleniSunPeakSchedule = async (GS_2, Ferreira) => {
+    /**
+     * 1. Calculate water available for the whole day
+     * 2. Calculate Water needed for edwaleni standard period full load
+     * 3. If water is left, priotirize offpeaek before standard
+     * 4. If water is left, run the entire standard: try 3 - 5 MW
+     * 5. If less water try 1.5MW and add each until all are added
+     * 6. Move to off peak
+     */
+
+    let generatedSchedule = this.state.currentSchedule;
+    // 1.
+    let availableWater = Math.round(this.calcTotalDailyFlow(GS_2 + Ferreira));
+    console.log(`\n edwaleni ===========start======`);
+    console.log("availableWater", availableWater);
+    // 2.
+    const standardFullLoadWater = Math.round(
+      this.calcEdwaleniLoadWater(7, 9.6, 5)
+    );
+    console.log(
+      "water needed for standardFullLoadWater (using sat. standard)",
+      standardFullLoadWater
+    );
+    console.log("avaialble water before standard full load", availableWater);
+    console.log("----end of standard---");
+    availableWater = availableWater - standardFullLoadWater;
+    console.log("after standard full load", availableWater);
+
+    if (availableWater >= 0) {
+      generatedSchedule = this.state.utils.methods.hourlyGen(
+        this.state.currentSchedule,
+        [
+          "7:00  -  8:00",
+          "8:00  -  9:00",
+          "9:00  -  10:00",
+          "10:00  -  11:00",
+          "11:00  -  12:00",
+          "18:00  -  19:00",
+          "19:00  -  20:00",
+        ],
+        "14.6",
+        "EDWALENI"
+      );
+    }
+    // 3.
+    const offPeakBeforeStandardWater = Math.round(
+      this.calcEdwaleniLoadWater(2, 9.6, 5)
+    );
+    availableWater = availableWater - offPeakBeforeStandardWater;
+    console.log(
+      "water needed for standardBeforePeak 2 hours",
+      offPeakBeforeStandardWater
+    );
+    console.log(
+      "water left after standardBeforePeak 2 hours: ",
+      availableWater
+    );
+
+    if (availableWater >= 0) {
+      generatedSchedule = this.state.utils.methods.hourlyGen(
+        this.state.currentSchedule,
+        ["6:00  -  7:00", "17:00  -  18:00"],
+        "14.6",
+        "EDWALENI"
+      );
+    }
+    let result = this.distributeEdwaleniPower(
+      generatedSchedule,
+      availableWater,
+      [
+        "12:00  -  13:00",
+        "13:00  -  14:00",
+        "14:00  -  15:00",
+        "15:00  -  16:00",
+        "16:00  -  17:00",
+        "20:00  -  21:00",
+        "21:00 -  22:00",
+        "22:00  - 23:00",
+        "23:00  -  00:00",
+        "0:00  -  1:00",
+        "1:00  -  2:00",
+        "2:00  -  3:00",
+        "3:00  -  4:00",
+        "4:00  -  5:00",
+        "5:00  -  6:00",
+      ],
+      "Off-Peak"
+    );
+
+    generatedSchedule = result.generatedSchedule;
+    availableWater = result.availableWater;
+    console.log("availableWater", availableWater);
+    console.log(` edwaleni ===========end======`);
 
     // calculate sum per hour periods
     generatedSchedule = this.state.utils.methods.calcWeekDaySum(
@@ -1027,7 +1239,7 @@ class InflowsProvider extends Component {
           waterConsumed + TOTAL_WATER_NEEDED_FOR_OFF_PEAK_SUN_HALF_LOAD;
       }
       if (SUN_OFFPEAKFULLLOAD === 0 || SUN_OFFPEAKFULLLOAD > 0) {
-        generatedSchedule = this.state.utils.methods.ezulwiniOffPeakHalfLoad(
+        generatedSchedule = this.state.utils.methods.ezulwiniOffPeakFullLoad(
           generatedSchedule
         );
         waterConsumed =
