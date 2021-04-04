@@ -75,6 +75,7 @@ export default class ViewModel extends Component {
   };
   handleEditModel() {
     this.setState({ canSave: true });
+    // this.context.editModel(this.state.data);
   }
   deleteModel = () => {
     let modelName = this.props.currentModel[0].Model_Name;

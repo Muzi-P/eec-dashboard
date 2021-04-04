@@ -117,7 +117,7 @@ class DrainageModel extends Component {
                 </CardBody>
               </Card>
             </Col>
-            <ModelChart />
+            {show && <ModelChart />}
           </Row>
         </div>
       </>

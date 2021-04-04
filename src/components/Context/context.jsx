@@ -30,6 +30,7 @@ class InflowsProvider extends Component {
       ezulwini: [],
       isAuthenticated: false,
       user: {},
+      showViewModel: false,
       settings: {},
       ezulwiniPS: {},
       magugaPS: {},
@@ -229,6 +230,7 @@ class InflowsProvider extends Component {
   };
   /**
    * @description get all active inflows years
+   * @param inflows
    */
   getAllYears = (inflows) => {
     let years = [];
@@ -337,6 +339,18 @@ class InflowsProvider extends Component {
     return dataGS15;
   };
 
+  editModel = (modelData) => {
+    let y_min_points = [];
+    let y_opt_points = [];
+    let y_max_points = [];
+
+    modelData.forEach((item) => {
+      y_min_points.push(parseFloat(item.min));
+      y_opt_points.push(parseFloat(item.opt));
+      y_max_points.push(parseFloat(item.max));
+    });
+    console.log({ y_min_points, y_opt_points, y_max_points });
+  };
   populateModel = (reviewYear) => {
     // Current model
     let singleYearInflows = this.state.inflows.filter((inflow) =>
@@ -801,6 +815,8 @@ class InflowsProvider extends Component {
         this.populateScheduleWeekEndOffPeak(day);
         // edwaleni same as off peak season
         this.populateEdwaleniWeekendOffPeakSchedule(GS_2, Ferreira, day);
+        // maguduza genarations
+        this.populateMaguduza();
         // maguga
         this.populateMagugaWeekDaySchedule(
           Regulating_Weir,
@@ -813,6 +829,8 @@ class InflowsProvider extends Component {
         this.populateScheduleWeekDayPeakSeason(Luphohlo_Daily_Level);
         // Edwaleni same as off-peak season
         this.populateEdwaleniWeekDayOffPeakSchedule(GS_2, Ferreira);
+        // maguduza genarations
+        this.populateMaguduza();
         this.populateMagugaWeekDaySchedule(
           Regulating_Weir,
           Irrigation_Flow,
@@ -827,6 +845,8 @@ class InflowsProvider extends Component {
         this.populateScheduleWeekEndOffPeak(day);
         // edwaleni
         this.populateEdwaleniWeekendOffPeakSchedule(GS_2, Ferreira, day);
+        // maguduza genarations
+        this.populateMaguduza();
         // maguga
         this.populateMagugaWeekDaySchedule(
           Regulating_Weir,
@@ -840,6 +860,8 @@ class InflowsProvider extends Component {
         this.populateScheduleWeekDayEzulwinOffPeakSeason(GS_2, Ferreira);
         // Edwaleni
         this.populateEdwaleniWeekDayOffPeakSchedule(GS_2, Ferreira);
+        // maguduza genarations
+        this.populateMaguduza();
         // Maguga
         this.populateMagugaWeekDaySchedule(
           Regulating_Weir,
@@ -1408,7 +1430,7 @@ class InflowsProvider extends Component {
     await this.setState({ currentSchedule: generatedSchedule });
     console.log(`Maguga ===========end======`);
     // maguduza genarations
-    this.populateMaguduza();
+    // this.populateMaguduza();
   };
 
   populateMaguduza = async () => {
@@ -1852,15 +1874,34 @@ class InflowsProvider extends Component {
    */
   updateModel = (edit, current, name) => {
     let currentModel = current;
-    edit.forEach((item, index) => {
-      currentModel[0].Min[index].y = item.min;
-      currentModel[0].Max[index].y = item.max;
-      currentModel[0].Opt[index].y = item.opt;
+    let y_min_points = [];
+    let y_opt_points = [];
+    let y_max_points = [];
+    edit.forEach((item) => {
+      y_min_points.push(parseFloat(item.min));
+      y_opt_points.push(parseFloat(item.opt));
+      y_max_points.push(parseFloat(item.max));
+    });
+    let postData = { y_min_points, y_opt_points, y_max_points };
+
+    axios
+      .post(`${process.env.REACT_APP_FLASK_API}/interpolate`, postData)
+      .then((res) => {
+        this.handleUpdateModel(res.data, currentModel, edit, name);
+      });
+  };
+  handleUpdateModel = (interpolatedModel, currentModel, edit, name) => {
+    const { max, min, opt } = interpolatedModel;
+    max.forEach((item, index) => {
+      currentModel[0].Max[index].y = item;
+      currentModel[0].Min[index].y = min[index];
+      currentModel[0].Opt[index].y = opt[index];
     });
     currentModel[0].Model_Name = edit.Model_Name;
     delete currentModel[0].__v;
     this.updateModelApi(currentModel, name);
   };
+
   updateModelApi = (model, name) => {
     axios
       .patch(
@@ -1876,16 +1917,34 @@ class InflowsProvider extends Component {
   };
 
   /*adding a new  model */
-  newModel = (model, modelName) => {
+  newModel = (newModel, modelName) => {
+    let y_min_points = [];
+    let y_opt_points = [];
+    let y_max_points = [];
+    newModel.forEach((item) => {
+      y_min_points.push(parseFloat(item.min));
+      y_opt_points.push(parseFloat(item.opt));
+      y_max_points.push(parseFloat(item.max));
+    });
+    let postData = { y_min_points, y_opt_points, y_max_points };
+
+    axios
+      .post(`${process.env.REACT_APP_FLASK_API}/interpolate`, postData)
+      .then((res) => {
+        this.handleNewModel(res.data, modelName);
+      });
+  };
+
+  handleNewModel = (interpolatedModel, modelName) => {
     let newModel = this.state.models[0];
-    const { Max, Min, Opt } = newModel;
-    model.forEach((item, index) => {
-      Max[index].y = item.max;
-      Min[index].y = item.min;
-      Opt[index].y = item.opt;
-      delete Max[index]._id;
-      delete Min[index]._id;
-      delete Opt[index]._id;
+    const { max, min, opt } = interpolatedModel;
+    max.forEach((item, index) => {
+      newModel.Max[index].y = item;
+      newModel.Min[index].y = min[index];
+      newModel.Opt[index].y = opt[index];
+      delete newModel.Max[index]._id;
+      delete newModel.Min[index]._id;
+      delete newModel.Opt[index]._id;
     });
     newModel.Model_Name = modelName;
     delete newModel._id;
@@ -1897,8 +1956,13 @@ class InflowsProvider extends Component {
   newModelApi = (model) => {
     axios
       .post(`${process.env.REACT_APP_API}/models`, model, this.state.config)
-      .then(this.getAllModels())
-      .catch((res) => console.log(res));
+      .then((res) => {
+        this.alert("New Model Created", `Model Name: ${res.data.Model_Name}`);
+        this.getAllModels();
+      })
+      .catch((res) => {
+        this.alert("New Model Creation", "Model Name Already Exits", "error");
+      });
   };
   signIn = (loginInfo) => {
     axios
@@ -2019,6 +2083,7 @@ class InflowsProvider extends Component {
           editConfig: this.editConfig,
           logOut: this.logOut,
           signUp: this.signUp,
+          editModel: this.editModel,
           exportSchedules: this.exportSchedules,
           getCurrentSchedule: this.getCurrentSchedule,
           editRatedFlow: this.editRatedFlow,
