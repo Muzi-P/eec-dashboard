@@ -58,6 +58,7 @@ export class Maguga extends Component {
   render() {
     const { magugaPS, disabled } = this.state;
     const { loading } = this.context;
+    const { admin } = this.props;
     return (
       <>
         {!loading && (
@@ -75,7 +76,8 @@ export class Maguga extends Component {
                         <Input
                           onChange={this.handleChange}
                           value={magugaPS.Total_Power_Output}
-                          type="text"
+                          type="number"
+                          disabled={true}
                         />
                       </FormGroup>
                     </Col>
@@ -85,7 +87,8 @@ export class Maguga extends Component {
                         <Input
                           onChange={this.handleChange}
                           value={magugaPS.Rated_Head}
-                          type="text"
+                          type="number"
+                          disabled={true}
                         />
                       </FormGroup>
                     </Col>
@@ -104,7 +107,8 @@ export class Maguga extends Component {
                         <Input
                           onChange={this.handleChange}
                           value={magugaPS.Genarators[0].Rated_Power}
-                          type="text"
+                          disabled={!admin}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -114,7 +118,8 @@ export class Maguga extends Component {
                         <Input
                           onChange={this.handleChange}
                           value={magugaPS.Genarators[0].Units}
-                          type="text"
+                          disabled={!admin}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -125,6 +130,7 @@ export class Maguga extends Component {
                           onChange={this.handleEzuwliniInputChange}
                           value={magugaPS.Genarators[0].Rated_Flow}
                           id="0"
+                          disabled={!admin}
                           type="number"
                         />
                       </FormGroup>
@@ -136,7 +142,8 @@ export class Maguga extends Component {
                         <Input
                           onChange={this.handleChange}
                           value={magugaPS.Genarators[1].Rated_Power}
-                          type="text"
+                          disabled={!admin}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -145,7 +152,8 @@ export class Maguga extends Component {
                         <Input
                           onChange={this.handleChange}
                           value={magugaPS.Genarators[1].Units}
-                          type="text"
+                          disabled={!admin}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -155,6 +163,7 @@ export class Maguga extends Component {
                           onChange={this.handleEzuwliniInputChange}
                           value={magugaPS.Genarators[1].Rated_Flow}
                           id="1"
+                          disabled={!admin}
                           type="number"
                         />
                       </FormGroup>

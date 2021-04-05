@@ -57,8 +57,9 @@ class DrainageModel extends Component {
   };
 
   render() {
-    const { selectedModel, currentModel } = this.context;
+    const { selectedModel, currentModel, user } = this.context;
     const { show } = this.state;
+    const admin = user.admin ? user.admin : false;
     return (
       <>
         <div className="content">
@@ -93,21 +94,24 @@ class DrainageModel extends Component {
                           </ButtonDropdown>
                         </FormGroup>
                       </Col>
-                      <Col>
-                        <Button
-                          className="btn-fill"
-                          color="primary"
-                          onClick={this.show}
-                        >
-                          New Model
-                        </Button>
-                      </Col>
+                      {admin && (
+                        <Col>
+                          <Button
+                            className="btn-fill"
+                            color="primary"
+                            onClick={this.show}
+                          >
+                            New Model
+                          </Button>
+                        </Col>
+                      )}
                     </Row>
                     <Row>
                       {show && (
                         <ViewModel
                           data={selectedModel}
                           currentModel={currentModel}
+                          admin={admin}
                           disable={this.state.disable}
                         />
                       )}

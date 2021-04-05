@@ -11,15 +11,16 @@ import Maguduza from "./Power Stations/Maguduza";
 class Settings extends React.Component {
   static contextType = InflowsContext;
   render() {
-    const { ezulwiniPS, maguduzaPS, edwaleniPS, magugaPS } = this.context;
+    const { ezulwiniPS, maguduzaPS, edwaleniPS, magugaPS, user } = this.context;
+    const admin = user.admin ? user.admin : false;
     return (
       <>
         <div className="content">
           <Row>
-            <Maguga magugaPS={magugaPS} />
-            <Ezulwini ezulwiniPS={ezulwiniPS} />
-            <Edwaleni edwaleniPS={edwaleniPS} />
-            <Maguduza maguduzaPS={maguduzaPS} />
+            <Maguga magugaPS={magugaPS} admin={admin} />
+            <Ezulwini ezulwiniPS={ezulwiniPS} admin={admin} />
+            <Edwaleni edwaleniPS={edwaleniPS} admin={admin} />
+            <Maguduza maguduzaPS={maguduzaPS} admin={admin} />
           </Row>
         </div>
       </>

@@ -25,8 +25,8 @@ class UserProfile extends React.Component {
       : this.context.user.name.split(" ")[1];
   }
   render() {
-    const { user } = this.context;
-    const { loading } = this.context;
+    const { user, loading } = this.context;
+    const admin = user.admin ? user.admin : false;
     return (
       <>
         {!loading && (
@@ -40,13 +40,24 @@ class UserProfile extends React.Component {
                   <CardBody>
                     <Form>
                       <Row>
-                        <Col className="pr-md-1" md="5">
+                        <Col className="pr-md-1" md="2">
+                          <FormGroup>
+                            <label>Account Type</label>
+                            <Input
+                              disabled={true}
+                              value={admin ? "admin" : "view-only"}
+                              onChange={this.handleInputChange}
+                            />
+                          </FormGroup>
+                        </Col>
+                        <Col className="pr-md-1" md="3">
                           <FormGroup>
                             <label>Company</label>
                             <Input
                               defaultValue="Eswatini Electricity Company"
                               placeholder="Company"
                               type="text"
+                              disabled={true}
                               onChange={this.handleInputChange}
                             />
                           </FormGroup>
@@ -58,6 +69,7 @@ class UserProfile extends React.Component {
                               placeholder="Username"
                               type="text"
                               onChange={this.handleInputChange}
+                              disabled={true}
                               value={user.name}
                             />
                           </FormGroup>
@@ -70,6 +82,7 @@ class UserProfile extends React.Component {
                             <Input
                               placeholder="mike@email.com"
                               type="email"
+                              disabled={true}
                               value={user.email}
                               onChange={this.handleInputChange}
                             />
@@ -82,6 +95,7 @@ class UserProfile extends React.Component {
                             <label>First Name</label>
                             <Input
                               placeholder="First Name"
+                              disabled={true}
                               type="text"
                               onChange={this.handleInputChange}
                               value={this.formatName(true)}
@@ -93,6 +107,7 @@ class UserProfile extends React.Component {
                             <label>Last Name</label>
                             <Input
                               placeholder="Last Name"
+                              disabled={true}
                               type="text"
                               onChange={this.handleInputChange}
                               value={this.formatName(false)}
@@ -107,6 +122,7 @@ class UserProfile extends React.Component {
                             <Input
                               defaultValue="Mbabane, Eswatini"
                               placeholder="Home Address"
+                              disabled={true}
                               type="text"
                             />
                           </FormGroup>
@@ -119,6 +135,7 @@ class UserProfile extends React.Component {
                             <Input
                               defaultValue="Mbabane"
                               placeholder="City"
+                              disabled={true}
                               type="text"
                             />
                           </FormGroup>
@@ -129,6 +146,7 @@ class UserProfile extends React.Component {
                             <Input
                               defaultValue="Eswatini"
                               placeholder="Country"
+                              disabled={true}
                               type="text"
                             />
                           </FormGroup>
@@ -136,14 +154,24 @@ class UserProfile extends React.Component {
                         <Col className="pl-md-1" md="4">
                           <FormGroup>
                             <label>Postal Code</label>
-                            <Input placeholder="ZIP Code" type="number" />
+
+                            <Input
+                              placeholder="ZIP Code"
+                              type="number"
+                              disabled={true}
+                            />
                           </FormGroup>
                         </Col>
                       </Row>
                     </Form>
                   </CardBody>
                   <CardFooter>
-                    <Button className="btn-fill" color="primary" type="submit">
+                    <Button
+                      className="btn-fill"
+                      color="primary"
+                      type="submit"
+                      disabled={true}
+                    >
                       Save
                     </Button>
                   </CardFooter>

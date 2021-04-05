@@ -67,6 +67,7 @@ export class Edwaleni extends Component {
   render() {
     const { edwaleniPS, disabled } = this.state;
     const { loading } = this.context;
+    const { admin } = this.props;
     return (
       <>
         {!loading && (
@@ -84,7 +85,8 @@ export class Edwaleni extends Component {
                         <Input
                           onChange={this.handleEdwaleniInputChange}
                           value={edwaleniPS.Total_Power_Output}
-                          type="text"
+                          type="number"
+                          disabled={true}
                         />
                       </FormGroup>
                     </Col>
@@ -94,7 +96,8 @@ export class Edwaleni extends Component {
                         <Input
                           onChange={this.handleEdwaleniInputChange}
                           value={edwaleniPS.Rated_Head}
-                          type="text"
+                          disabled={true}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -113,7 +116,8 @@ export class Edwaleni extends Component {
                         <Input
                           onChange={this.handleEdwaleniInputChange}
                           value={edwaleniPS.Genarators[0].Rated_Power}
-                          type="text"
+                          disabled={!admin}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -123,7 +127,8 @@ export class Edwaleni extends Component {
                         <Input
                           onChange={this.handleEdwaleniInputChange}
                           value={edwaleniPS.Genarators[0].Units}
-                          type="text"
+                          disabled={!admin}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -134,6 +139,7 @@ export class Edwaleni extends Component {
                           onChange={this.handleEdwaleniInputChange}
                           value={edwaleniPS.Genarators[0].Rated_Flow}
                           id="Rated_Flow"
+                          disabled={!admin}
                           type="number"
                         />
                       </FormGroup>
@@ -145,7 +151,8 @@ export class Edwaleni extends Component {
                         <Input
                           onChange={this.handleEdwaleniInputChange}
                           value={edwaleniPS.Genarators[1].Rated_Power}
-                          type="text"
+                          disabled={!admin}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -154,7 +161,8 @@ export class Edwaleni extends Component {
                         <Input
                           onChange={this.handleEdwaleniInputChange}
                           value={edwaleniPS.Genarators[1].Units}
-                          type="text"
+                          disabled={!admin}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -164,6 +172,7 @@ export class Edwaleni extends Component {
                           onChange={this.handleEdwaleniRatedInputChange}
                           value={edwaleniPS.Genarators[1].Rated_Flow}
                           id="Rated_Flow"
+                          disabled={!admin}
                           type="number"
                         />
                       </FormGroup>

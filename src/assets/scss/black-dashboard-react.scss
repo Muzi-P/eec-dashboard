@@ -128,8 +128,8 @@
 .MuiTextField-root {
   border-color: #2b3553 !important;
 }
-p.MuiTypography-root.MuiTypography-body1.MuiTypography-alignCenter{
-  color:#3f51b5;
+p.MuiTypography-root.MuiTypography-body1.MuiTypography-alignCenter {
+  color: #3f51b5;
 }
 
 * {
@@ -403,4 +403,12 @@ button.ghost {
 }
 .swal-footer {
   text-align: center;
+}
+
+.form-control[disabled],
+.form-control[readonly],
+fieldset[disabled] {
+  color: white;
+  background-color: transparent;
+  cursor: not-allowed;
 }

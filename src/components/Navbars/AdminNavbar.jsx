@@ -78,6 +78,8 @@ class AdminNavbar extends React.Component {
     // this.props.history.push(path);
   };
   render() {
+    const { user } = this.context;
+    const admin = user.admin ? user.admin : false;
     return (
       <>
         <Navbar
@@ -186,7 +188,9 @@ class AdminNavbar extends React.Component {
                   </DropdownToggle>
                   <DropdownMenu className="dropdown-navbar" right tag="ul">
                     <ReactNavLink tag="li" to="/admin/user-profile">
-                      <DropdownItem className="nav-item">Profile</DropdownItem>
+                      <DropdownItem className="nav-item">
+                        {admin ? "Profile(admin)" : "Profile"}
+                      </DropdownItem>
                     </ReactNavLink>
                     <ReactNavLink tag="li" to="/admin/settings">
                       <DropdownItem className="nav-item">Settings</DropdownItem>

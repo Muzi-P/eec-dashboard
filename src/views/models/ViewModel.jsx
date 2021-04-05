@@ -100,7 +100,7 @@ export default class ViewModel extends Component {
 
   render() {
     const { columns, model } = this.state;
-    const { data } = this.props;
+    const { data, admin } = this.props;
     return (
       <>
         <Col md="12">
@@ -116,6 +116,7 @@ export default class ViewModel extends Component {
                           onChange={this.handleModelNAmeChange}
                           value={model.Model_Name}
                           id="Model_Name"
+                          disabled={!admin}
                           type="text"
                         />
                       </FormGroup>
@@ -126,6 +127,7 @@ export default class ViewModel extends Component {
                         <Input
                           value={model.createdAt.split("T")[0]}
                           type="text"
+                          disabled={!admin}
                           onChange={this.handleModelNAmeChange}
                         />
                       </FormGroup>
@@ -136,6 +138,7 @@ export default class ViewModel extends Component {
                         <Input
                           value={model.updatedAt.split("T")[0]}
                           onChange={this.handleModelNAmeChange}
+                          disabled={!admin}
                           type="text"
                         />
                       </FormGroup>
@@ -154,41 +157,45 @@ export default class ViewModel extends Component {
                   search: false,
                 }}
                 editable={{
-                  onRowUpdate: (newData, oldData) =>
-                    new Promise((resolve) => {
-                      setTimeout(() => {
-                        resolve();
-                        if (oldData) {
-                          this.setState((prevState) => {
-                            const data = [...prevState.data];
-                            data[data.indexOf(oldData)] = newData;
-                            return { ...prevState, data };
-                          });
-                          this.handleEditModel();
-                        }
-                      }, 600);
-                    }),
+                  onRowUpdate: admin
+                    ? (newData, oldData) =>
+                        new Promise((resolve) => {
+                          setTimeout(() => {
+                            resolve();
+                            if (oldData) {
+                              this.setState((prevState) => {
+                                const data = [...prevState.data];
+                                data[data.indexOf(oldData)] = newData;
+                                return { ...prevState, data };
+                              });
+                              this.handleEditModel();
+                            }
+                          }, 600);
+                        })
+                    : undefined,
                 }}
               />
             </CardBody>
-            <CardFooter>
-              <Button
-                className="btn-fill"
-                color="success"
-                onClick={this.handleSaveModel}
-                disabled={!this.state.canSave}
-              >
-                Save Model
-              </Button>
-              <Button
-                className="btn-fill"
-                color="danger"
-                onClick={this.deleteModel}
-                disabled={this.props.disable}
-              >
-                Delete Model
-              </Button>
-            </CardFooter>
+            {admin && (
+              <CardFooter>
+                <Button
+                  className="btn-fill"
+                  color="success"
+                  onClick={this.handleSaveModel}
+                  disabled={!this.state.canSave}
+                >
+                  Save Model
+                </Button>
+                <Button
+                  className="btn-fill"
+                  color="danger"
+                  onClick={this.deleteModel}
+                  disabled={this.props.disable}
+                >
+                  Delete Model
+                </Button>
+              </CardFooter>
+            )}
           </Card>
         </Col>
       </>

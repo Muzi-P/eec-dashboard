@@ -54,6 +54,7 @@ export class Maguduza extends Component {
   render() {
     const { maguduzaPS, disabled } = this.state;
     const { loading } = this.context;
+    const { admin } = this.props;
     return (
       <>
         {!loading && (
@@ -71,7 +72,8 @@ export class Maguduza extends Component {
                         <Input
                           onChange={this.handleMaguduzaInputChange}
                           value={maguduzaPS.Total_Power_Output}
-                          type="text"
+                          disabled={true}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -81,7 +83,8 @@ export class Maguduza extends Component {
                         <Input
                           onChange={this.handleMaguduzaInputChange}
                           value={maguduzaPS.Rated_Head}
-                          type="text"
+                          disabled={true}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -100,7 +103,8 @@ export class Maguduza extends Component {
                         <Input
                           onChange={this.handleMaguduzaInputChange}
                           value={maguduzaPS.Genarators[0].Rated_Power}
-                          type="text"
+                          disabled={!admin}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -110,7 +114,8 @@ export class Maguduza extends Component {
                         <Input
                           onChange={this.handleMaguduzaInputChange}
                           value={maguduzaPS.Genarators[0].Units}
-                          type="text"
+                          disabled={!admin}
+                          type="number"
                         />
                       </FormGroup>
                     </Col>
@@ -121,6 +126,7 @@ export class Maguduza extends Component {
                           onChange={this.handleMaguduzaInputChange}
                           value={maguduzaPS.Genarators[0].Rated_Flow}
                           id="Rated_Flow"
+                          disabled={!admin}
                           type="number"
                         />
                       </FormGroup>
