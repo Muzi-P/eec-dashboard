@@ -113,7 +113,27 @@ class InflowsProvider extends Component {
           value: "",
         },
         {
-          text: "Maguga Weir Limit(m.a.s.l)",
+          text: "Weir Limit(m.a.s.l)",
+          value: "",
+        },
+        {
+          text: "Weir Limit(m³)",
+          value: "",
+        },
+        {
+          text: "Weir Initial Level(m.a.s.l)",
+          value: "",
+        },
+        {
+          text: "Weir Initial Level(m³)",
+          value: "",
+        },
+        {
+          text: "Weir Final Level(m.a.s.l)",
+          value: "",
+        },
+        {
+          text: "Weir Final Level(m³)",
           value: "",
         },
       ],
