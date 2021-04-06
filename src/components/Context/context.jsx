@@ -1449,56 +1449,31 @@ class InflowsProvider extends Component {
     }
     await this.setState({ currentSchedule: generatedSchedule });
     console.log(`Maguga ===========end======`);
-    // maguduza genarations
-    // this.populateMaguduza();
   };
 
   populateMaguduza = async () => {
     let generatedSchedule = this.state.currentSchedule;
-    let availableWater = 0;
-    const maguduzaRatedFlow = parseFloat(
-      this.state.maguduzaPS.Genarators[0].Rated_Flow
-    );
     // maguduza can run at 5.6, 5, 4, 3 levels
-
-    // const levelOneHourlyWater = this.calWaterConsumedByAnyMachine(
-    //   1,
-    //   5.6,
-    //   maguduzaRatedFlow
-    // );
-    // const levelTwoHourlyWater = this.calWaterConsumedByAnyMachine(
-    //   1,
-    //   5,
-    //   maguduzaRatedFlow
-    // );
-    // const levelThreeHourlyWater = this.calWaterConsumedByAnyMachine(
-    //   1,
-    //   4,
-    //   maguduzaRatedFlow
-    // );
-    // const levelFourHourlyWater = this.calWaterConsumedByAnyMachine(
-    //   1,
-    //   3,
-    //   maguduzaRatedFlow
-    // );
-    console.log(`Maguduza ===========start======`);
     generatedSchedule.forEach((item) => {
       const edwaleniPower = parseFloat(item.EDWALENI);
       if (item.Time && edwaleniPower > 0) {
-        availableWater = this.edwaleniHourlyOutFlow(edwaleniPower);
-        console.log(
-          ` water release from edwaleni @${edwaleniPower} MW: ${availableWater} during ${item.Time} period`
-        );
-        // console.log(item.EDWALENI);
-        item.MAGUDUZA = this.calcMagugaHourGen(
-          maguduzaRatedFlow,
-          [5.6, 5, 4, 3],
-          availableWater
-        );
+        item.MAGUDUZA = this.maguduzaHourlyGen(edwaleniPower);
       }
     });
     await this.setState({ currentSchedule: generatedSchedule });
-    console.log(`Maguduza ===========end======`);
+  };
+  maguduzaHourlyGen = (edwaleniPower) => {
+    let maguduzaPower = 0;
+    if (edwaleniPower === 14.6) {
+      maguduzaPower = 5.6;
+    } else if (edwaleniPower >= 10 && edwaleniPower <= 14.6) {
+      maguduzaPower = 5;
+    } else if (edwaleniPower >= 8 && edwaleniPower <= 10) {
+      maguduzaPower = 4;
+    } else if (edwaleniPower >= 5 && edwaleniPower <= 8) {
+      maguduzaPower = 3;
+    }
+    return maguduzaPower;
   };
   calcMagugaHourGen = (maguduzaRatedFlow, maguduzaLevels, availableWater) => {
     let maguduzaHourlyPower = 0;
