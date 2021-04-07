@@ -34,6 +34,7 @@ class GenerateSchedule extends Component {
       Regulating_Weir: "",
       Maguga_Downstream_Wear_Limit: "",
       Ferreira: "",
+      queryInflows: {},
       GS_15: "",
       GS_2: "",
       valid: true,
@@ -54,12 +55,47 @@ class GenerateSchedule extends Component {
   }
 
   handleChange = async (date) => {
+    const event = new Event("dummy");
     await this.setState({
       startDate: date,
     });
     this.context.handleForecastDateChange(this.state.startDate);
+    this.context
+      .getInflow(this.context.formatDate(date))
+      .then((res) => {
+        this.setState({ queryInflows: res.data });
+        this.loadPreviousInflows(event, true);
+      })
+      .catch((err) => {
+        this.clearInputs();
+      });
   };
-
+  clearInputs = () => {
+    this.setState({
+      Mkinkomo_Reservoir_Daily_Level: "",
+    });
+    this.setState({
+      Luphohlo_Daily_Level: "",
+    });
+    this.setState({
+      Ferreira: "",
+    });
+    this.setState({
+      Ferreira: "",
+    });
+    this.setState({
+      GS_15: "",
+    });
+    this.setState({
+      GS_2: "",
+    });
+    this.setState({
+      Regulating_Weir: "",
+    });
+    this.setState({
+      Irrigation_Flow: "",
+    });
+  };
   componentDidMount = () => {
     this.context.handleForecastDateChange(this.state.startDate);
   };
@@ -146,9 +182,11 @@ class GenerateSchedule extends Component {
       }
     }
   };
-  loadPreviousInflows = async (e) => {
+  loadPreviousInflows = async (e, queryInflows = false) => {
     const { inflows } = this.context;
-    var lastInflow = inflows.slice(-1)[0];
+    var lastInflow = queryInflows
+      ? this.state.queryInflows
+      : inflows.slice(-1)[0];
     const {
       Mkinkomo_Reservoir_Daily_Level,
       Luphohlo_Daily_Level,

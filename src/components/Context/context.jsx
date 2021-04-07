@@ -503,6 +503,14 @@ class InflowsProvider extends Component {
     );
     return response;
   };
+
+  getInflow = async (date) => {
+    let response = await axios.get(
+      `${process.env.REACT_APP_API}/inflows/${date}`,
+      this.state.config
+    );
+    return response;
+  };
   populateDataPoints = (view = false) => {
     let data = this.populateModelDataPoints();
 
@@ -2137,7 +2145,9 @@ class InflowsProvider extends Component {
           keepLoggedIn: this.keepLoggedIn,
           editConfig: this.editConfig,
           logOut: this.logOut,
+          getInflow: this.getInflow,
           signUp: this.signUp,
+          formatDate: this.formatDate,
           editModel: this.editModel,
           exportSchedules: this.exportSchedules,
           getCurrentSchedule: this.getCurrentSchedule,
