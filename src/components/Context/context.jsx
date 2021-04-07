@@ -121,11 +121,27 @@ class InflowsProvider extends Component {
           value: "",
         },
         {
+          text: "Weir Limit(%)",
+          value: "",
+        },
+        {
           text: "Weir Initial Level(m.a.s.l)",
           value: "",
         },
         {
           text: "Weir Initial Level(m³)",
+          value: "",
+        },
+        {
+          text: "Weir Initial Level(%)",
+          value: "",
+        },
+        {
+          text: "Available Water(m³)",
+          value: "",
+        },
+        {
+          text: "Available Hours(hrs)",
           value: "",
         },
         {
@@ -478,6 +494,14 @@ class InflowsProvider extends Component {
     ];
 
     return data;
+  };
+
+  interpolate = async (url, postData) => {
+    let response = await axios.post(
+      `${process.env.REACT_APP_FLASK_API}/${url}`,
+      postData
+    );
+    return response;
   };
   populateDataPoints = (view = false) => {
     let data = this.populateModelDataPoints();
@@ -1297,6 +1321,11 @@ class InflowsProvider extends Component {
     waterConsumed = (waterConsumed / 1000000).toFixed(2);
     this.updateSummary("Water Used (mil. m³)", waterConsumed);
     this.updateSummary("Final Dam Level(%)", finalDamVolume);
+    this.interpolate("luphohlo-volume-interpolate", {
+      volume: finalDamVolume,
+    }).then((res) => {
+      console.log(res);
+    });
     await this.setState({ currentSchedule: generatedSchedule });
   };
   populateScheduleWeekDayEzulwinOffPeakSeason = async (GS_2, Ferreira) => {
@@ -1352,11 +1381,16 @@ class InflowsProvider extends Component {
 
     let finalDamVolume =
       DAILY_LUPHOHLO_INFLOW + INITIAL_LUPHOHLO_DAM_VOLUME - waterConsumed;
+    this.interpolate("luphohlo-volume-interpolate", {
+      volume: finalDamVolume,
+    }).then((res) => {
+      this.updateSummary("Final Dam Level(m.a.s.l)", res.data.level);
+    });
     finalDamVolume = this.volumeToPerc(finalDamVolume);
     waterConsumed = (waterConsumed / 1000000).toFixed(2);
-
     this.updateSummary("Water Used (mil. m³)", waterConsumed);
     this.updateSummary("Final Dam Level(%)", finalDamVolume);
+
     await this.setState({ currentSchedule: generatedSchedule });
   };
 
@@ -1449,8 +1483,34 @@ class InflowsProvider extends Component {
     }
     await this.setState({ currentSchedule: generatedSchedule });
     console.log(`Maguga ===========end======`);
-  };
 
+    // update UI
+    this.updateSummary("Available Water(m³)", availableWater);
+    this.updateSummary("Available Hours(hrs)", availableHours);
+    // limit level
+    this.updateSummary("Weir Limit(m.a.s.l)", Maguga_Downstream_Wear_Limit);
+    this.interpolate("weir-level-interpolate", {
+      level: Maguga_Downstream_Wear_Limit,
+    }).then((res) => {
+      this.updateSummary("Weir Limit(m³)", res.data.volume);
+      this.updateSummary(
+        "Weir Limit(%)",
+        this.weirVolumeToPerc(res.data.volume)
+      );
+    });
+    // current level
+    this.updateSummary("Weir Initial Level(m.a.s.l)", Regulating_Weir);
+    this.interpolate("weir-level-interpolate", {
+      level: Regulating_Weir,
+    }).then((res) => {
+      this.updateSummary("Weir Initial Level(m³)", res.data.volume);
+      this.updateSummary(
+        "Weir Initial Level(%)",
+        this.weirVolumeToPerc(res.data.volume)
+      );
+    });
+  };
+  weirVolumeToPerc = (volume) => ((volume / 987500) * 100).toFixed(2);
   populateMaguduza = async () => {
     let generatedSchedule = this.state.currentSchedule;
     // maguduza can run at 5.6, 5, 4, 3 levels
