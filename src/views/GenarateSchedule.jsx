@@ -221,8 +221,9 @@ class GenerateSchedule extends Component {
     await this.setState({
       Irrigation_Flow,
     });
+    // split date string and get first array eg. 2020-07-01T16:00:00.000Z => 2020-07-01
     await this.setState({
-      startDate: new Date(Day_of_Input),
+      startDate: new Date(Day_of_Input.split("T")[0]),
     });
     const disabled = this.isValid();
     this.setState({ disabled });
