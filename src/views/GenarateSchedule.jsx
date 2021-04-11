@@ -184,6 +184,7 @@ class GenerateSchedule extends Component {
   };
   loadPreviousInflows = async (e, queryInflows = false) => {
     const { inflows } = this.context;
+    if (Object.keys(inflows).length === 0) return;
     var lastInflow = queryInflows
       ? this.state.queryInflows
       : inflows.slice(-1)[0];

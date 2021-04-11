@@ -183,7 +183,6 @@ class InflowsProvider extends Component {
       .get(`${process.env.REACT_APP_API}/inflows`, this.state.config)
       .then((res) => {
         this.setState({ inflows: res.data });
-        this.setState({ loading: false });
         this.getAllYears(res.data);
       })
       .catch(() => {
@@ -240,13 +239,11 @@ class InflowsProvider extends Component {
           break;
       }
     });
-    this.setState({ loading: false });
   };
   /**
    * @description get all models
    */
   getAllModels = () => {
-    this.setState({ loading: true });
     axios
       .get(`${process.env.REACT_APP_API}/models`, this.state.config)
       .then((res) => {
