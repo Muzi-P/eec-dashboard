@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Cookies from "js-cookie";
 import MultiSeriesAreaChart from "../components/Graphs/MuLtiSeriesAreaChart";
 import MuLtiSeriesAreaChartGS15Wrapper from "../components/Graphs/MuLtiSeriesAreaChartGS_15Wrapper";
+import MuLtiSeriesAreaChartGS2Wrapper from "../components/Graphs/MuLtiSeriesAreaChartGS_2Wrapper";
 import { InflowsContext } from "../components/Context/context";
 import {
   Card,
@@ -174,6 +175,7 @@ class Dashboard extends Component {
             </Col>
           </Row>
           <MuLtiSeriesAreaChartGS15Wrapper />
+          <MuLtiSeriesAreaChartGS2Wrapper />
           {/* <Row>
             <Col lg="4">
               <Card className="card-chart">

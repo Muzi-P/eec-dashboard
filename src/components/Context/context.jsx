@@ -26,6 +26,7 @@ class InflowsProvider extends Component {
       selectedModel: [],
       currentModel: [],
       gs15ReviewYears: [`${new Date().getFullYear()}`],
+      gs2ReviewYears: [`${new Date().getFullYear()}`],
       years: [],
       ezulwini: [],
       isAuthenticated: false,
@@ -272,7 +273,14 @@ class InflowsProvider extends Component {
       if (!years.includes(year.toString())) years.push(year.toString());
     });
     this.setState({ years });
-    this.setState({ gs15ReviewYears: years });
+    // show last n years
+    let n = 5;
+    this.setState({
+      gs15ReviewYears: years.slice(Math.max(years.length - n, 1)),
+    });
+    this.setState({
+      gs2ReviewYears: years.slice(Math.max(years.length - n, 1)),
+    });
   };
   /**
    * @description format model names
@@ -344,7 +352,7 @@ class InflowsProvider extends Component {
         .catch((res) => console.log(res));
     });
   }
-  populateGS15Model = (reviewYear) => {
+  populateGS15Model = (reviewYear, gs2 = false) => {
     let singleYearInflows = this.state.inflows.filter((inflow) =>
       inflow.Day_of_Input.includes(reviewYear)
     );
@@ -356,7 +364,7 @@ class InflowsProvider extends Component {
         (inflow) => new Date(inflow.Day_of_Input).getMonth() === i
       );
       let monthlyGS15 = singleMonth.map((inflow) => {
-        return parseFloat(inflow.GS_15);
+        return gs2 ? parseFloat(inflow.GS_2) : parseFloat(inflow.GS_15);
       });
       let average = this.gs15MonthlyInflowsAverage(monthlyGS15);
       let object = {};
@@ -436,15 +444,43 @@ class InflowsProvider extends Component {
       this.setState({ reviewModels: [...this.state.reviewModels, model] });
     }
   };
-  handleGS15ReviewYear = (year) => {
+  handleGS15ReviewYear = async (year) => {
     if (this.state.gs15ReviewYears.includes(year)) {
-      this.setState({
+      await this.setState({
         gs15ReviewYears: this.state.gs15ReviewYears.filter(
           (item) => item !== year
         ),
       });
     } else {
-      this.setState({ gs15ReviewYears: [...this.state.gs15ReviewYears, year] });
+      await this.setState({
+        gs15ReviewYears: [...this.state.gs15ReviewYears, year],
+      });
+    }
+
+    // prevent graph fron being empty
+    if (this.state.gs15ReviewYears.length === 0) {
+      this.setState({
+        gs15ReviewYears: [`${new Date().getFullYear()}`],
+      });
+    }
+  };
+  handleGS2ReviewYear = async (year) => {
+    if (this.state.gs2ReviewYears.includes(year)) {
+      await this.setState({
+        gs2ReviewYears: this.state.gs2ReviewYears.filter(
+          (item) => item !== year
+        ),
+      });
+    } else {
+      await this.setState({
+        gs2ReviewYears: [...this.state.gs2ReviewYears, year],
+      });
+    }
+    // prevent graph fron being empty
+    if (this.state.gs2ReviewYears.length === 0) {
+      this.setState({
+        gs2ReviewYears: [`${new Date().getFullYear()}`],
+      });
     }
   };
   populateModelDataPoints = () => {
@@ -552,6 +588,13 @@ class InflowsProvider extends Component {
     });
     return reviewYearsGS15DataPoints;
   };
+  populateGS2DataPoints = () => {
+    let reviewYearsGS2DataPoints = this.state.gs2ReviewYears.map((year) => {
+      let singleYearDataPoint = this.singleYearGS15DataPoint(year, true);
+      return singleYearDataPoint;
+    });
+    return reviewYearsGS2DataPoints;
+  };
 
   singleYearDataPoint = (year) => {
     let data = {
@@ -564,14 +607,14 @@ class InflowsProvider extends Component {
     };
     return data;
   };
-  singleYearGS15DataPoint = (year) => {
+  singleYearGS15DataPoint = (year, gs2 = false) => {
     let data = {
       type: "spline",
       name: year,
       showInLegend: true,
       xValueFormatString: "MMM",
       yValueFormatString: "#,###.## m^3/s",
-      dataPoints: this.populateGS15Model(year),
+      dataPoints: this.populateGS15Model(year, gs2),
     };
     return data;
   };
@@ -2128,8 +2171,10 @@ class InflowsProvider extends Component {
           handleReviewYear: this.handleReviewYear,
           populateDataPoints: this.populateDataPoints,
           handleGS15ReviewYear: this.handleGS15ReviewYear,
+          handleGS2ReviewYear: this.handleGS2ReviewYear,
           changeGS15ForecastYear: this.changeGS15ForecastYear,
           populateGS15DataPoints: this.populateGS15DataPoints,
+          populateGS2DataPoints: this.populateGS2DataPoints,
           handleForecastDateChange: this.handleForecastDateChange,
           generateSchedule: this.generateSchedule,
           handleReviewModel: this.handleReviewModel,
