@@ -178,7 +178,7 @@ class InflowsProvider extends Component {
   /**
    * @description get all inflows
    */
-  getAllInflows = () => {
+  getAllInflows = (postingInflow = false) => {
     this.setState({ loading: true });
     axios
       .get(`${process.env.REACT_APP_API}/inflows`, this.state.config)
@@ -189,6 +189,8 @@ class InflowsProvider extends Component {
       .catch(() => {
         this.setState({ isAuthenticated: false });
       });
+
+    if (postingInflow) this.setState({ loading: false });
   };
   /**
    * @description get all power stations
@@ -1885,7 +1887,8 @@ class InflowsProvider extends Component {
           "Inflows Added",
           `Date: ${res.data.Day_of_Input.split("T")[0]}`
         );
-        this.getAllInflows();
+        // send true so that we disable loading
+        this.getAllInflows(true);
       })
       .catch((res) => console.log(res));
   };

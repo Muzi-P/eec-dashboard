@@ -51,6 +51,25 @@ export class Edwaleni extends Component {
       edwaleniPS.Genarators[0].Rated_Flow = e.target.value;
       this.setState({ edwaleniPS });
     }
+
+    if (e.target.id === "Rated_Power") {
+      this.setState({ disabled: false });
+      let edwaleniPS = this.state.edwaleniPS;
+      let smallSetPower = e.target.value;
+      edwaleniPS.Genarators[0].Rated_Power = smallSetPower;
+
+      if (smallSetPower > 2.5 || smallSetPower < 1) {
+        this.setState({ disabled: true });
+      } else {
+        // set total power output
+        let totalPowerOutput =
+          parseFloat(smallSetPower) * 4 +
+          parseFloat(this.state.edwaleniPS.Genarators[1].Rated_Power);
+        edwaleniPS.Total_Power_Output = +totalPowerOutput;
+      }
+
+      this.setState({ edwaleniPS });
+    }
   };
   handleEdwaleniRatedInputChange = (e) => {
     if (e.target.id === "Rated_Flow") {
@@ -117,6 +136,7 @@ export class Edwaleni extends Component {
                           onChange={this.handleEdwaleniInputChange}
                           value={edwaleniPS.Genarators[0].Rated_Power}
                           disabled={!admin}
+                          id="Rated_Power"
                           type="number"
                         />
                       </FormGroup>
@@ -127,7 +147,7 @@ export class Edwaleni extends Component {
                         <Input
                           onChange={this.handleEdwaleniInputChange}
                           value={edwaleniPS.Genarators[0].Units}
-                          disabled={!admin}
+                          disabled={true}
                           type="number"
                         />
                       </FormGroup>
@@ -161,7 +181,7 @@ export class Edwaleni extends Component {
                         <Input
                           onChange={this.handleEdwaleniInputChange}
                           value={edwaleniPS.Genarators[1].Units}
-                          disabled={!admin}
+                          disabled={true}
                           type="number"
                         />
                       </FormGroup>
