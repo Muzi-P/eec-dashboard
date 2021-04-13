@@ -53,18 +53,30 @@ class GenerateSchedule extends Component {
       ],
     };
   }
-
+  /**
+   *
+   * @param {*} date
+   * @description populate corresponding date when date from calender is selected, we compare "dateString" with "returnStringDate" because back return any dat after queried date even if it's not the same date as on the calender
+   */
   handleChange = async (date) => {
     const event = new Event("dummy");
     await this.setState({
       startDate: date,
     });
     this.context.handleForecastDateChange(this.state.startDate);
+    let dateString = this.context.formatDate(date);
     this.context
       .getInflow(this.context.formatDate(date))
       .then((res) => {
-        this.setState({ queryInflows: res.data });
-        this.loadPreviousInflows(event, true);
+        let returnStringDate = this.context.formatDate(
+          res.data.Day_of_Input.split("T")[0]
+        );
+        if (returnStringDate === dateString) {
+          this.setState({ queryInflows: res.data });
+          this.loadPreviousInflows(event, true);
+        } else {
+          this.clearInputs();
+        }
       })
       .catch((err) => {
         this.clearInputs();
@@ -98,6 +110,7 @@ class GenerateSchedule extends Component {
   };
   componentDidMount = () => {
     this.context.handleForecastDateChange(this.state.startDate);
+    this.handleChange(this.state.startDate);
   };
   componentDidUpdate(prevProps) {
     // Typical usage (don't forget to compare props):
@@ -184,7 +197,7 @@ class GenerateSchedule extends Component {
   };
   loadPreviousInflows = async (e, queryInflows = false) => {
     const { inflows } = this.context;
-    if (Object.keys(inflows).length === 0) return;
+    // if (Object.keys(inflows).length === 0) return;
     var lastInflow = queryInflows
       ? this.state.queryInflows
       : inflows.slice(-1)[0];
