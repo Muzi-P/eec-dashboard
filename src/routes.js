@@ -1,5 +1,5 @@
 import Dashboard from "./views/Dashboard";
-import Notifications from "./views/Notifications.jsx";
+// import Notifications from "./views/Notifications.jsx";
 import UserProfile from "./views/UserProfile.jsx";
 import PowerStations from "./views/Settings.jsx";
 import Configurations from "./views/Configurations/index";
@@ -24,14 +24,14 @@ var routes = [
     component: GenerateSchedule,
     layout: "/admin",
   },
-  {
-    path: "/notifications",
-    name: "Notifications",
-    rtlName: "إخطارات",
-    icon: "tim-icons icon-bell-55",
-    component: Notifications,
-    layout: "/admin",
-  },
+  // {
+  //   path: "/notifications",
+  //   name: "Notifications",
+  //   rtlName: "إخطارات",
+  //   icon: "tim-icons icon-bell-55",
+  //   component: Notifications,
+  //   layout: "/admin",
+  // },
   {
     path: "/user-profile",
     name: "User Profile",

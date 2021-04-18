@@ -26,14 +26,18 @@ export default class DailySummary extends Component {
                 </Col>
               </Row>
               <Row>
-                {summary.slice(0, 10).map((item, index) => {
-                  return (
-                    <Col className="pr-md-1" md="4" key={index}>
-                      <label htmlFor="exampleInputEmail1">{item.text}</label>
-                      <h5 className="title">{item.value}</h5>
-                    </Col>
-                  );
-                })}
+                {summary
+                  .filter(
+                    (summaryItem) => summaryItem.powerStation === "ezulwini"
+                  )
+                  .map((item, index) => {
+                    return (
+                      <Col className="pr-md-1" md="4" key={index}>
+                        <label htmlFor="exampleInputEmail1">{item.text}</label>
+                        <h5 className="title">{item.value}</h5>
+                      </Col>
+                    );
+                  })}
               </Row>
               <br />
               <Row>
@@ -42,14 +46,18 @@ export default class DailySummary extends Component {
                 </Col>
               </Row>
               <Row>
-                {summary.slice(10).map((item, index) => {
-                  return (
-                    <Col className="pr-md-1" md="4" key={index}>
-                      <label htmlFor="exampleInputEmail1">{item.text}</label>
-                      <h5 className="title">{item.value}</h5>
-                    </Col>
-                  );
-                })}
+                {summary
+                  .filter(
+                    (summaryItem) => summaryItem.powerStation === "maguga"
+                  )
+                  .map((item, index) => {
+                    return (
+                      <Col className="pr-md-1" md="4" key={index}>
+                        <label htmlFor="exampleInputEmail1">{item.text}</label>
+                        <h5 className="title">{item.value}</h5>
+                      </Col>
+                    );
+                  })}
               </Row>
             </CardBody>
           </Card>

@@ -409,6 +409,6 @@ button.ghost {
 .form-control[readonly],
 fieldset[disabled] {
   color: white;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.08);
   cursor: not-allowed;
 }

@@ -14,9 +14,9 @@ export default class PreviousInflows extends Component {
         <tr key={index}>
           <td>{item.Day_of_Input.split("T")[0]}</td>
           <td>{item.Luphohlo_Daily_Level}</td>
+          <td>{item.GS_15}</td>
           <td>{item.Mkinkomo_Reservoir_Daily_Level}</td>
           <td>{item.GS_2}</td>
-          <td>{item.GS_15}</td>
           <td>{item.Ferreira}</td>
         </tr>
       );
@@ -34,9 +34,9 @@ export default class PreviousInflows extends Component {
                   <tr>
                     <th>Day_of_Input</th>
                     <th>Luphohlo</th>
+                    <th>GS_15</th>
                     <th>Mkinkomo</th>
                     <th>GS_2</th>
-                    <th>GS_15</th>
                     <th>Ferreira</th>
                   </tr>
                 </thead>

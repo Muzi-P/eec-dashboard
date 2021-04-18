@@ -8,6 +8,8 @@ import functions from "../../utils/functions";
 import swal from "sweetalert";
 import Cookies from "js-cookie";
 import FileDownload from "js-file-download";
+import moment from "moment";
+import "moment-duration-format";
 const InflowsContext = React.createContext();
 
 class InflowsProvider extends Component {
@@ -36,10 +38,16 @@ class InflowsProvider extends Component {
       ezulwiniPS: {},
       magugaPS: {},
       edwaleniPS: {},
+      edwaleniPSFormated: {},
       maguduzaPS: {},
       config: {},
       schedules: {},
-      date: `${new Date().toDateString()}`,
+      date: `${new Date().toLocaleDateString("en-gb", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "long",
+      })}`,
       months: [
         "January",
         "February",
@@ -76,82 +84,112 @@ class InflowsProvider extends Component {
         {
           text: "Current Model",
           value: "",
+          powerStation: "ezulwini",
         },
         {
           text: "Current Month",
           value: "",
+          powerStation: "ezulwini",
         },
         {
           text: "Daily Limit (m.a.s.l)",
           value: "",
+          powerStation: "ezulwini",
         },
         {
           text: "Daily Limit (%)",
           value: "",
+          powerStation: "ezulwini",
         },
         {
           text: "Initial Dam Level (m.a.s.l)",
           value: "",
+          powerStation: "ezulwini",
         },
         {
           text: "Initial Dam Level (%)",
           value: "",
+          powerStation: "ezulwini",
         },
         {
           text: "Available Water (mil. m³)",
           value: "",
+          powerStation: "ezulwini",
+        },
+        {
+          text: "Required Water (mil. m³)",
+          value: "N/A",
+          powerStation: "ezulwini",
+        },
+        {
+          text: "Earliest Generation (time)",
+          value: "N/A",
+          powerStation: "ezulwini",
         },
         {
           text: "Water Used (mil. m³)",
           value: "",
+          powerStation: "ezulwini",
         },
         {
           text: "Final Dam Level(m.a.s.l)",
           value: "",
+          powerStation: "ezulwini",
         },
         {
           text: "Final Dam Level(%)",
           value: "",
+          powerStation: "ezulwini",
         },
         {
           text: "Weir Limit(m.a.s.l)",
           value: "",
+          powerStation: "maguga",
         },
         {
           text: "Weir Limit(m³)",
           value: "",
+          powerStation: "maguga",
         },
         {
           text: "Weir Limit(%)",
           value: "",
+          powerStation: "maguga",
         },
         {
           text: "Weir Initial Level(m.a.s.l)",
           value: "",
+          powerStation: "maguga",
         },
         {
           text: "Weir Initial Level(m³)",
           value: "",
+          powerStation: "maguga",
         },
         {
           text: "Weir Initial Level(%)",
           value: "",
+          powerStation: "maguga",
         },
         {
           text: "Available Water(m³)",
           value: "",
+          powerStation: "maguga",
         },
         {
           text: "Available Hours(hrs)",
           value: "",
+          powerStation: "maguga",
         },
         {
           text: "Weir Final Level(m.a.s.l)",
           value: "",
+          powerStation: "maguga",
         },
         {
           text: "Weir Final Level(m³)",
           value: "",
+          powerStation: "maguga",
         },
       ],
     };
@@ -242,6 +280,20 @@ class InflowsProvider extends Component {
           break;
       }
     });
+    let edwaleniPSFormated = {};
+    let smallSetPower = parseFloat(
+      this.state.edwaleniPS.Genarators[0].Rated_Power
+    );
+    let bigSetPower = parseFloat(
+      this.state.edwaleniPS.Genarators[1].Rated_Power
+    );
+    let totalSmallSetPowerOutput = 4 * smallSetPower;
+    edwaleniPSFormated.smallSetPower = smallSetPower;
+    edwaleniPSFormated.totalPowerOutput =
+      totalSmallSetPowerOutput + bigSetPower;
+    edwaleniPSFormated.bigSetPower = bigSetPower;
+    edwaleniPSFormated.totalSmallSetPowerOutput = totalSmallSetPowerOutput;
+    this.setState({ edwaleniPSFormated });
   };
   /**
    * @description get all models
@@ -647,6 +699,7 @@ class InflowsProvider extends Component {
     if (day !== 6 && day !== 0) {
       this.setState({ currentSchedule: this.state.weekDayGenSchedule });
     }
+    this.resetSummary();
   };
   /**
    * @description format date string date type ---> "yyyy-mm-dd" or "yyyy,mm,dd"
@@ -982,14 +1035,19 @@ class InflowsProvider extends Component {
      * 5. If less water try 1.5MW and add each until all are added
      * 6. Move to off peak
      */
-
+    let {
+      totalPowerOutput,
+      totalSmallSetPowerOutput,
+    } = this.state.edwaleniPSFormated;
     let generatedSchedule = this.state.currentSchedule;
     // 1.
     let availableWater = Math.round(this.calcTotalDailyFlow(GS_2 + Ferreira));
     console.log(`\n edwaleni and maguduza ===========start======`);
     console.log("availableWater", availableWater);
     // 2.
-    const peakFullLoadWater = Math.round(this.calcEdwaleniLoadWater(5, 9.6, 5));
+    const peakFullLoadWater = Math.round(
+      this.calcEdwaleniLoadWater(5, totalSmallSetPowerOutput, 5)
+    );
     console.log("peakFullLoadWater", peakFullLoadWater);
     console.log("avaialble water before peak full load", availableWater);
     console.log("----end of peak---");
@@ -1000,13 +1058,14 @@ class InflowsProvider extends Component {
       generatedSchedule = this.state.utils.methods.periodGen(
         this.state.currentSchedule,
         "Peak",
-        "14.6",
+        `${totalPowerOutput}`,
         "EDWALENI"
       );
     }
     // 3.
+
     const standardBeforePeakWater = Math.round(
-      this.calcEdwaleniLoadWater(2, 9.6, 5)
+      this.calcEdwaleniLoadWater(2, totalSmallSetPowerOutput, 5)
     );
     availableWater = availableWater - standardBeforePeakWater;
     console.log(
@@ -1022,7 +1081,7 @@ class InflowsProvider extends Component {
       generatedSchedule = this.state.utils.methods.hourlyGen(
         this.state.currentSchedule,
         ["6:00  -  7:00", "17:00  -  18:00"],
-        "14.6",
+        `${totalPowerOutput}`,
         "EDWALENI"
       );
     }
@@ -1381,8 +1440,10 @@ class InflowsProvider extends Component {
   populateScheduleWeekDayEzulwinOffPeakSeason = async (GS_2, Ferreira) => {
     const {
       PEAK,
+      GS_15,
       STANDARD,
       STANDARDHALFLOAD,
+      TOTAL_DAILY_AVAILABLE_WATER,
       OFFPEAKHALFLOAD,
       OFFPEAKFULLLOAD,
       TOTAL_WATER_NEEDED_FOR_PEAK_FULL_LOAD,
@@ -1396,8 +1457,25 @@ class InflowsProvider extends Component {
     let generatedSchedule = this.state.utils.methods.allShutDown(
       this.state.currentSchedule
     );
+    this.updateSummary(
+      "Required Water (mil. m³)",
+      this.luphohloVolumeToMillionVol(TOTAL_WATER_NEEDED_FOR_PEAK_FULL_LOAD)
+    );
     let waterConsumed = 0;
-
+    if (PEAK < 0) {
+      // calculate "Earliest Generaton" indicate how soon  the machine can be available => TOTAL_DAILY_AVAILABLE_WATER / GS_15
+      const waterNeededForEarliestGeneration =
+        TOTAL_WATER_NEEDED_FOR_PEAK_FULL_LOAD - TOTAL_DAILY_AVAILABLE_WATER;
+      const timeInSeconds = Math.floor(
+        waterNeededForEarliestGeneration / GS_15
+      );
+      this.updateSummary(
+        "Earliest Generation (time)",
+        this.formatDuration(timeInSeconds)
+      );
+    } else {
+      this.updateSummary("Earliest Generation (time)", "N/A");
+    }
     if (PEAK === 0 || PEAK > 0) {
       generatedSchedule = this.state.utils.methods.ezulwiniPeakFullLoad(
         generatedSchedule
@@ -1444,6 +1522,26 @@ class InflowsProvider extends Component {
     await this.setState({ currentSchedule: generatedSchedule });
   };
 
+  /**
+   *
+   * @param {*} seconds
+   * @description convert seconds to human readable time seconds => "10 years, 3 months"
+   */
+  formatDuration = (seconds) => {
+    const duration = moment
+      .duration(seconds, "seconds")
+      .format("M [months],d [days], h [hrs]");
+    return duration;
+  };
+  localeDateString = (dateString) => {
+    const formattedDate = new Date(dateString).toLocaleDateString("en-gb", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+    });
+    return formattedDate;
+  };
   /**
    * @description calculate water needed for edwaleni peak full load
    */
@@ -1561,6 +1659,8 @@ class InflowsProvider extends Component {
     });
   };
   weirVolumeToPerc = (volume) => ((volume / 987500) * 100).toFixed(2);
+  luphohloVolumeToMillionVol = (volume) =>
+    ((volume / 23600000) * 100).toFixed(2);
   populateMaguduza = async () => {
     let generatedSchedule = this.state.currentSchedule;
     // maguduza can run at 5.6, 5, 4, 3 levels
@@ -1574,9 +1674,9 @@ class InflowsProvider extends Component {
   };
   maguduzaHourlyGen = (edwaleniPower) => {
     let maguduzaPower = 0;
-    if (edwaleniPower === 14.6) {
+    if (edwaleniPower >= 14.6) {
       maguduzaPower = 5.6;
-    } else if (edwaleniPower >= 10 && edwaleniPower <= 14.6) {
+    } else if (edwaleniPower >= 10 && edwaleniPower < 14.6) {
       maguduzaPower = 5;
     } else if (edwaleniPower >= 8 && edwaleniPower <= 10) {
       maguduzaPower = 4;
@@ -1711,7 +1811,7 @@ class InflowsProvider extends Component {
       DAILY_LUPHOHLO_INFLOW + INITIAL_LUPHOHLO_DAM_VOLUME - MONTHLY_LIMIT;
     this.updateSummary(
       "Available Water (mil. m³)",
-      (TOTAL_DAILY_AVAILABLE_WATER / 1000000).toFixed(2)
+      this.luphohloVolumeToMillionVol(TOTAL_DAILY_AVAILABLE_WATER)
     );
 
     /* weekdays */
@@ -1783,6 +1883,8 @@ class InflowsProvider extends Component {
       SAT_OFFPEAKHALFLOAD,
       SAT_OFFPEAKFULLLOAD,
       SUN_OFFPEAKHALFLOAD,
+      GS_15,
+      TOTAL_DAILY_AVAILABLE_WATER,
       SUN_OFFPEAKFULLLOAD,
       TOTAL_WATER_NEEDED_FOR_STND_SAT_FULL_LOAD,
       TOTAL_WATER_NEEDED_FOR_OFF_PEAK_SAT_FULL_LOAD,
@@ -1807,8 +1909,8 @@ class InflowsProvider extends Component {
     hours,
     periodName
   ) => {
+    let { smallSetPower } = this.state.edwaleniPSFormated;
     let cummulatedPower = 0;
-
     for (let power = 5; power > 2; power--) {
       let bigSetWater = Math.round(
         this.calcEdwaleniLoadWater(hours.length, 0, power)
@@ -1828,7 +1930,7 @@ class InflowsProvider extends Component {
     // 5.
 
     let SmallSetWater = Math.round(
-      this.calcEdwaleniLoadWater(hours.length, 0, 2.4)
+      this.calcEdwaleniLoadWater(hours.length, 0, smallSetPower)
     );
     console.log("water needed by smallset", SmallSetWater);
     let smallSetsPowerSum = 0;
@@ -1836,10 +1938,10 @@ class InflowsProvider extends Component {
       if (availableWater < SmallSetWater) {
         break;
       }
-      smallSetsPowerSum = 2.4 * index;
+      smallSetsPowerSum = smallSetPower * index;
       availableWater = availableWater - SmallSetWater;
       console.log(
-        `available water after (${index}) 2.4 Mw set : ${availableWater}`
+        `available water after (${index}) ${smallSetPower} Mw set : ${availableWater}`
       );
     }
     cummulatedPower = cummulatedPower + smallSetsPowerSum;
@@ -1877,16 +1979,25 @@ class InflowsProvider extends Component {
   };
 
   /**
+   *
+   * @description reset the summary
+   */
+  resetSummary = () => {
+    let summary = this.state.summary;
+    summary.forEach((item) => {
+      item.value = "";
+    });
+  };
+  /**
    * @description post new inflows
+   * @param {*} inflow
    * */
   postInflow = (inflow) => {
     axios
       .post(`${process.env.REACT_APP_API}/inflows`, inflow, this.state.config)
       .then((res) => {
-        this.alert(
-          "Inflows Added",
-          `Date: ${res.data.Day_of_Input.split("T")[0]}`
-        );
+        const date = this.localeDateString(res.data.Day_of_Input);
+        this.alert("Schedule Generated", `${date}`);
         // send true so that we disable loading
         this.getAllInflows(true);
       })
@@ -1903,7 +2014,7 @@ class InflowsProvider extends Component {
         this.state.config
       )
       .then((res) => {
-        this.alert("Rated Flow Updated", res.data.Name);
+        this.alert("Power Station Updated", res.data.Name);
         this.getAllPowerStations();
       })
       .catch((res) => console.log(res));

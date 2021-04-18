@@ -64,7 +64,8 @@ export class Config extends Component {
     this.setState({ disabled: true });
   };
   render() {
-    const { loading } = this.context;
+    const { loading, user } = this.context;
+    const admin = user.admin ? user.admin : false;
     const { settings, disabled, modelNames } = this.state;
     return (
       <>
@@ -85,6 +86,7 @@ export class Config extends Component {
                           type="number"
                           id="Luphohlo_Weekend_Limit"
                           value={settings.Luphohlo_Weekend_Limit}
+                          disabled={!admin}
                         />
                       </FormGroup>
                     </Col>
@@ -96,6 +98,7 @@ export class Config extends Component {
                           name="select"
                           id="Default_Model"
                           onChange={this.handleConfigInputChange}
+                          disabled={!admin}
                         >
                           {modelNames.map((model, index) => {
                             return <option key={index}>{model}</option>;
@@ -113,6 +116,7 @@ export class Config extends Component {
                           value={settings.Maguga_Downstream_Wear_Limit}
                           id="Maguga_Downstream_Wear_Limit"
                           type="number"
+                          disabled={!admin}
                         />
                       </FormGroup>
                     </Col>
