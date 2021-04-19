@@ -123,7 +123,7 @@ class InflowsProvider extends Component {
         },
         {
           text: "Earliest Generation (time)",
-          value: "N/A",
+          value: "Immediate",
           powerStation: "ezulwini",
         },
         {
