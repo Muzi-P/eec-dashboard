@@ -123,7 +123,7 @@ class InflowsProvider extends Component {
         },
         {
           text: "Earliest Generation (time)",
-          value: "Immediate",
+          value: "Immediately",
           powerStation: "ezulwini",
         },
         {
@@ -1474,7 +1474,7 @@ class InflowsProvider extends Component {
         this.formatDuration(timeInSeconds)
       );
     } else {
-      this.updateSummary("Earliest Generation (time)", "Immediate");
+      this.updateSummary("Earliest Generation (time)", "Immediately");
     }
     if (PEAK === 0 || PEAK > 0) {
       generatedSchedule = this.state.utils.methods.ezulwiniPeakFullLoad(
