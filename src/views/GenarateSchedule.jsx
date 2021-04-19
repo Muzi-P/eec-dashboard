@@ -292,6 +292,7 @@ class GenerateSchedule extends Component {
                             name="select"
                             id="model"
                             onChange={this.handleInputChange}
+                            disabled={!admin}
                           >
                             {this.context.modelNames.map((model, index) => {
                               return <option key={index}>{model}</option>;

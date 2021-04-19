@@ -406,9 +406,8 @@ button.ghost {
 }
 
 .form-control[disabled],
-.form-control[readonly],
 fieldset[disabled] {
   color: white;
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: #cccccc1f;
   cursor: not-allowed;
 }
