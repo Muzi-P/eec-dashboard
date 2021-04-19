@@ -1530,7 +1530,7 @@ class InflowsProvider extends Component {
   formatDuration = (seconds) => {
     const duration = moment
       .duration(seconds, "seconds")
-      .format("M [months],d [days], h [hrs]");
+      .format("M [months],d [days], h [hrs], m [mins]");
     return duration;
   };
   localeDateString = (dateString) => {
