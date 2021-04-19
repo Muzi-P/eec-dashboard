@@ -247,8 +247,9 @@ class GenerateSchedule extends Component {
     e.preventDefault();
   };
   render() {
-    const { date, loading } = this.context;
+    const { date, loading, user } = this.context;
     const { disabled, Maguga_Downstream_Wear_Limit } = this.state;
+    const admin = user.admin ? user.admin : false;
     return (
       <>
         <div className="content">
@@ -456,7 +457,7 @@ class GenerateSchedule extends Component {
             <PreviousInflows />
           </Row>
           <Row>
-            <WeekDayGenSchedule date={this.state.startDate} />
+            <WeekDayGenSchedule date={this.state.startDate} admin={admin} />
             <DailySummary />
           </Row>
         </div>

@@ -44,6 +44,7 @@ export default class WeekDayGenSchedule extends Component {
   render() {
     const { currentSchedule } = this.context;
     const { columns, date } = this.state;
+    const { admin } = this.props;
     return (
       <>
         <Col md="12" lg="12" xl="7">
@@ -62,20 +63,22 @@ export default class WeekDayGenSchedule extends Component {
                   search: false,
                 }}
                 editable={{
-                  onRowUpdate: (newData, oldData) =>
-                    new Promise((resolve) => {
-                      setTimeout(() => {
-                        resolve();
-                        if (oldData) {
-                          this.setState((prevState) => {
-                            const data = [...prevState.data];
-                            data[data.indexOf(oldData)] = newData;
-                            return { ...prevState, data };
-                          });
-                          this.handleSaveModel();
-                        }
-                      }, 100);
-                    }),
+                  onRowUpdate: admin
+                    ? (newData, oldData) =>
+                        new Promise((resolve) => {
+                          setTimeout(() => {
+                            resolve();
+                            if (oldData) {
+                              this.setState((prevState) => {
+                                const data = [...prevState.data];
+                                data[data.indexOf(oldData)] = newData;
+                                return { ...prevState, data };
+                              });
+                              this.handleSaveModel();
+                            }
+                          }, 100);
+                        })
+                    : undefined,
                 }}
               />
               {/* <Table className="tablesorter" responsive bordered>
