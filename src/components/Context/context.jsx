@@ -1474,7 +1474,7 @@ class InflowsProvider extends Component {
         this.formatDuration(timeInSeconds)
       );
     } else {
-      this.updateSummary("Earliest Generation (time)", "N/A");
+      this.updateSummary("Earliest Generation (time)", "Immediate");
     }
     if (PEAK === 0 || PEAK > 0) {
       generatedSchedule = this.state.utils.methods.ezulwiniPeakFullLoad(
