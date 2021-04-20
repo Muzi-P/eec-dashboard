@@ -182,12 +182,22 @@ class InflowsProvider extends Component {
           powerStation: "maguga",
         },
         {
+          text: "Actual Water Consumed(m³)",
+          value: "",
+          powerStation: "maguga",
+        },
+        {
           text: "Weir Final Level(m.a.s.l)",
           value: "",
           powerStation: "maguga",
         },
         {
           text: "Weir Final Level(m³)",
+          value: "",
+          powerStation: "maguga",
+        },
+        {
+          text: "Weir Final Level(%)",
           value: "",
           powerStation: "maguga",
         },
@@ -1657,6 +1667,63 @@ class InflowsProvider extends Component {
         this.weirVolumeToPerc(res.data.volume)
       );
     });
+
+    // calculate water consumed by Maguga machines
+    const totalMagugaWaterConsumed = this.calcWaterConsumedByMagugaGeneration(
+      `${availableHours}`
+    );
+    // const waterDifference = availableWater - totalMagugaWaterConsumed;
+    const finalWeirVolume =
+      currentVolume - irrigationVolume + totalMagugaWaterConsumed;
+    // update UI
+    this.updateSummary("Weir Final Level(m³)", finalWeirVolume);
+    this.updateSummary("Actual Water Consumed(m³)", totalMagugaWaterConsumed);
+    this.updateSummary(
+      "Weir Final Level(%)",
+      this.weirVolumeToPerc(finalWeirVolume)
+    );
+    this.interpolate("weir-volume-interpolate", {
+      volume: finalWeirVolume,
+    }).then((res) => {
+      this.updateSummary("Weir Final Level(m.a.s.l)", res.data.level);
+    });
+    console.log(totalMagugaWaterConsumed);
+  };
+  /**
+   * @description calculate total water consumed during maguga generation
+   */
+  calcWaterConsumedByMagugaGeneration = (availableHours) => {
+    const availableHoursSplit = availableHours.split(".");
+    const availableHoursInt = availableHoursSplit[0];
+    const availableHoursFrac = availableHoursSplit[1];
+
+    // water consumed by whole number of availableHours
+
+    const hourlySetsWater = this.calcWaterConsumedByMagugaSetsFullLoad();
+    const waterForHoursInt = hourlySetsWater * availableHoursInt;
+
+    // water consumed by fraction of availableHours
+    const finalWattage = this.handleMagugaHalfGen(availableHoursFrac);
+    const magugaRatedFlow = parseFloat(
+      this.state.magugaPS.Genarators[0].Rated_Flow
+    );
+    const waterForHoursFrac = this.calWaterConsumedByAnyMachine(
+      1,
+      finalWattage,
+      magugaRatedFlow
+    );
+    return waterForHoursInt + waterForHoursFrac;
+  };
+  handleMagugaHalfGen = (hourFraction) => {
+    let power = 0;
+    if (hourFraction === 0) {
+      power = 0;
+    } else if (hourFraction >= 3 && hourFraction <= 8) {
+      power = 10;
+    } else if (hourFraction > 8) {
+      power = 20;
+    }
+    return power;
   };
   weirVolumeToPerc = (volume) => ((volume / 987500) * 100).toFixed(2);
   luphohloVolumeToMillionVol = (volume) =>
