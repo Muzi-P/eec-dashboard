@@ -254,7 +254,7 @@ class GenerateSchedule extends Component {
       <>
         <div className="content">
           <Row>
-            <Col md="12" lg="12" xl="6">
+            <Col xs="12" sm="12" md="12" lg="12" xl="6">
               <Card>
                 <CardHeader>
                   <h4 className="title">ENTER INFLOWS</h4>
