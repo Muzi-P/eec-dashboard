@@ -8,8 +8,8 @@ import functions from "../../utils/functions";
 import swal from "sweetalert";
 import Cookies from "js-cookie";
 import FileDownload from "js-file-download";
-import moment from "moment";
-import "moment-duration-format";
+// import moment from "moment";
+// import "moment-duration-format";
 const InflowsContext = React.createContext();
 
 class InflowsProvider extends Component {
@@ -1469,10 +1469,10 @@ class InflowsProvider extends Component {
       const timeInSeconds = Math.floor(
         waterNeededForEarliestGeneration / GS_15
       );
-      this.updateSummary(
-        "Earliest Generation (time)",
-        this.formatDuration(timeInSeconds)
-      );
+      // this.updateSummary(
+      //   "Earliest Generation (time)",
+      //   this.formatDuration(timeInSeconds)
+      // );
     } else {
       this.updateSummary("Earliest Generation (time)", "Immediately");
     }
@@ -1527,12 +1527,12 @@ class InflowsProvider extends Component {
    * @param {*} seconds
    * @description convert seconds to human readable time seconds => "10 years, 3 months"
    */
-  formatDuration = (seconds) => {
-    const duration = moment
-      .duration(seconds, "seconds")
-      .format("M [months],d [days], h [hrs], m [mins]");
-    return duration;
-  };
+  // formatDuration = (seconds) => {
+  //   const duration = moment
+  //     .duration(seconds, "seconds")
+  //     .format("M [months],d [days], h [hrs], m [mins]");
+  //   return duration;
+  // };
   localeDateString = (dateString) => {
     const formattedDate = new Date(dateString).toLocaleDateString("en-gb", {
       year: "numeric",
