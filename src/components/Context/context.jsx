@@ -1525,7 +1525,7 @@ class InflowsProvider extends Component {
   /**
    *
    * @param {*} seconds
-   * @description convert seconds to human readable time seconds => "10 years, 3 months"
+   * @description convert seconds to human readable time e.g seconds => "10 years, 3 months"
    */
   // formatDuration = (seconds) => {
   //   const duration = moment
