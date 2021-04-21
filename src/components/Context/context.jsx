@@ -1677,7 +1677,10 @@ class InflowsProvider extends Component {
       currentVolume - irrigationVolume + totalMagugaWaterConsumed;
     // update UI
     this.updateSummary("Weir Final Level(m³)", finalWeirVolume);
-    this.updateSummary("Actual Water Consumed(m³)", totalMagugaWaterConsumed);
+    this.updateSummary(
+      "Actual Water Consumed(m³)",
+      totalMagugaWaterConsumed.toFixed(0)
+    );
     this.updateSummary(
       "Weir Final Level(%)",
       this.weirVolumeToPerc(finalWeirVolume)
@@ -1687,7 +1690,6 @@ class InflowsProvider extends Component {
     }).then((res) => {
       this.updateSummary("Weir Final Level(m.a.s.l)", res.data.level);
     });
-    console.log(totalMagugaWaterConsumed);
   };
   /**
    * @description calculate total water consumed during maguga generation
