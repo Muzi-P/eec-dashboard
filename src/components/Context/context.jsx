@@ -162,7 +162,7 @@ class InflowsProvider extends Component {
           powerStation: "maguga",
         },
         {
-          text: "Weir Initial Level(m³)",
+          text: "Weir Initial Volume(m³)",
           value: "",
           powerStation: "maguga",
         },
@@ -192,7 +192,7 @@ class InflowsProvider extends Component {
           powerStation: "maguga",
         },
         {
-          text: "Weir Final Level(m³)",
+          text: "Weir Final Volume(m³)",
           value: "",
           powerStation: "maguga",
         },
@@ -1661,7 +1661,7 @@ class InflowsProvider extends Component {
     this.interpolate("weir-level-interpolate", {
       level: Regulating_Weir,
     }).then((res) => {
-      this.updateSummary("Weir Initial Level(m³)", res.data.volume);
+      this.updateSummary("Weir Initial Volume(m³)", res.data.volume);
       this.updateSummary(
         "Weir Initial Level(%)",
         this.weirVolumeToPerc(res.data.volume)
@@ -1676,7 +1676,7 @@ class InflowsProvider extends Component {
     const finalWeirVolume =
       currentVolume - irrigationVolume + totalMagugaWaterConsumed;
     // update UI
-    this.updateSummary("Weir Final Level(m³)", finalWeirVolume);
+    this.updateSummary("Weir Final Volume(m³)", finalWeirVolume.toFixed(0));
     this.updateSummary(
       "Actual Water Consumed(m³)",
       totalMagugaWaterConsumed.toFixed(0)
