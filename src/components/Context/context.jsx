@@ -729,6 +729,7 @@ class InflowsProvider extends Component {
       : [year, month, day].join("-");
   };
   volumeToPerc = (volume) => ((volume / 23600000) * 100).toFixed(2);
+  percToVolume = (perc) => ((perc / 100) * 23600000).toFixed(2);
   generateSchedule = async (state) => {
     const {
       startDate,
@@ -2377,6 +2378,9 @@ class InflowsProvider extends Component {
           exportSchedules: this.exportSchedules,
           getCurrentSchedule: this.getCurrentSchedule,
           editRatedFlow: this.editRatedFlow,
+          percToVolume: this.percToVolume,
+          interpolate: this.interpolate,
+          volumeToPerc: this.volumeToPerc,
         }}
       >
         {this.props.children}
