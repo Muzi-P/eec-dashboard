@@ -1436,16 +1436,18 @@ class InflowsProvider extends Component {
 
     let finalDamVolume =
       DAILY_LUPHOHLO_INFLOW + INITIAL_LUPHOHLO_DAM_VOLUME - waterConsumed;
-    finalDamVolume = this.volumeToPerc(finalDamVolume);
+    let finalDamVolumePer = this.volumeToPerc(finalDamVolume);
 
     waterConsumed = (waterConsumed / 1000000).toFixed(2);
     this.updateSummary("Water Used (mil. m³)", waterConsumed);
-    this.updateSummary("Final Dam Level(%)", finalDamVolume);
+    this.updateSummary("Final Dam Level(%)", finalDamVolumePer);
     this.interpolate("luphohlo-volume-interpolate", {
-      volume: finalDamVolume,
+      volume: parseInt(finalDamVolume),
     }).then((res) => {
-      console.log(res);
+      this.updateSummary("Final Dam Level(m.a.s.l)", res.data.level);
     });
+    this.updateSummary("Required Water (mil. m³)", "N/A");
+    this.updateSummary("Earliest Generation (time)", "N/A");
     await this.setState({ currentSchedule: generatedSchedule });
   };
   populateScheduleWeekDayEzulwinOffPeakSeason = async (GS_2, Ferreira) => {
@@ -1567,25 +1569,37 @@ class InflowsProvider extends Component {
     return parseFloat(peakkFullLoadWater); //  85500
   };
   populateScheduleWeekDayPeakSeason = async (Luphohlo_Daily_Level) => {
+    const {
+      DAILY_LUPHOHLO_INFLOW,
+      INITIAL_LUPHOHLO_DAM_VOLUME,
+      PEAK,
+    } = this.state.ezulwini;
     let generatedSchedule = this.state.utils.methods.ezulwiniShutDown(
       this.state.currentSchedule
     );
+    let waterConsumed = 0;
     // ezulwini
     if (parseInt(Luphohlo_Daily_Level) > 1002) {
       generatedSchedule = this.state.utils.methods.ezulwiniPeakFullLoad(
         generatedSchedule
       );
-      let waterConsumed = (this.state.ezulwini.PEAK / 1000000).toFixed(2);
+      waterConsumed = (PEAK / 1000000).toFixed(2);
       this.updateSummary("Water Used (mil. m³)", waterConsumed);
     }
 
-    // edwaleni
-    generatedSchedule = this.state.utils.methods.edwaleniPeakFullLoad(
-      generatedSchedule
-    );
-    generatedSchedule = this.state.utils.methods.maguduzaPeakFullLoad(
-      generatedSchedule
-    );
+    let finalDamVolume =
+      DAILY_LUPHOHLO_INFLOW + INITIAL_LUPHOHLO_DAM_VOLUME - waterConsumed;
+    this.interpolate("luphohlo-volume-interpolate", {
+      volume: finalDamVolume,
+    }).then((res) => {
+      this.updateSummary("Final Dam Level(m.a.s.l)", res.data.level);
+    });
+    finalDamVolume = this.volumeToPerc(finalDamVolume);
+    waterConsumed = (waterConsumed / 1000000).toFixed(2);
+    this.updateSummary("Final Dam Level(%)", finalDamVolume);
+    this.updateSummary("Required Water (mil. m³)", "N/A");
+    this.updateSummary("Earliest Generation (time)", "N/A");
+
     await this.setState({ currentSchedule: generatedSchedule });
   };
   /**

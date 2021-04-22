@@ -184,14 +184,14 @@ class GenerateSchedule extends Component {
       }
     }
     // update Luphohlo_Daily_Volume_Perc input when  Luphohlo_Daily_Level changes
-    this.context
-      .interpolate("luphohlo-level-interpolate", {
-        level: currentValue,
-      })
-      .then((res) => {
-        const Luphohlo_Daily_Volume = res.data.volume;
-        this.updatePerc(Luphohlo_Daily_Volume);
-      });
+    // this.context
+    //   .interpolate("luphohlo-level-interpolate", {
+    //     level: currentValue,
+    //   })
+    //   .then((res) => {
+    //     const Luphohlo_Daily_Volume = res.data.volume;
+    //     this.updatePerc(Luphohlo_Daily_Volume);
+    //   });
   };
   volumePercOnfocusOut = (e) => {
     let Luphohlo_Daily_Volume_Perc = e.target.value;
@@ -341,7 +341,7 @@ class GenerateSchedule extends Component {
                           </Input>
                         </FormGroup>
                       </Col>
-                      <Col className="pr-md-1" md="4">
+                      {/* <Col className="pr-md-1" md="4">
                         <FormGroup>
                           <label>Luphohlo Daily Level(m.a.s.l)</label>
                           <Input
@@ -354,10 +354,10 @@ class GenerateSchedule extends Component {
                             onChange={this.handleInputChange}
                           />
                         </FormGroup>
-                      </Col>
+                      </Col> */}
                     </Row>
                     <Row>
-                      <Col className="pr-md-1" md="3">
+                      {/* <Col className="pr-md-1" md="3">
                         <FormGroup>
                           <label>Luphohlo Daily Level (%)</label>
                           <Input
@@ -367,6 +367,20 @@ class GenerateSchedule extends Component {
                             type="number"
                             onBlur={this.volumePercOnfocusOut}
                             value={this.state.Luphohlo_Daily_Volume_Perc}
+                            onChange={this.handleInputChange}
+                          />
+                        </FormGroup>
+                      </Col> */}
+                      <Col className="pr-md-1" md="3">
+                        <FormGroup>
+                          <label>Luphohlo Daily Level</label>
+                          <Input
+                            id="Luphohlo_Daily_Level"
+                            placeholder="m.a.s.l."
+                            required
+                            type="number"
+                            value={this.state.Luphohlo_Daily_Level}
+                            onBlur={this.luphohloOnfocusOut}
                             onChange={this.handleInputChange}
                           />
                         </FormGroup>
