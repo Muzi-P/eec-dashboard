@@ -37,6 +37,7 @@ class GenerateSchedule extends Component {
       queryInflows: {},
       GS_15: "",
       GS_2: "",
+      Luphohlo_Daily_Volume_Perc: "",
       valid: true,
       disabled: true,
       model: "",
@@ -182,6 +183,30 @@ class GenerateSchedule extends Component {
         });
       }
     }
+    // update Luphohlo_Daily_Volume_Perc input when  Luphohlo_Daily_Level changes
+    // this.context
+    //   .interpolate("luphohlo-level-interpolate", {
+    //     level: currentValue,
+    //   })
+    //   .then((res) => {
+    //     const Luphohlo_Daily_Volume = res.data.volume;
+    //     this.updatePerc(Luphohlo_Daily_Volume);
+    //   });
+  };
+  volumePercOnfocusOut = (e) => {
+    let Luphohlo_Daily_Volume_Perc = e.target.value;
+    if (Luphohlo_Daily_Volume_Perc > 100) Luphohlo_Daily_Volume_Perc = 100;
+    if (Luphohlo_Daily_Volume_Perc < 0) Luphohlo_Daily_Volume_Perc = 0;
+    const currentVolume = this.context.percToVolume(Luphohlo_Daily_Volume_Perc);
+    this.context
+      .interpolate("luphohlo-volume-interpolate", {
+        volume: parseInt(currentVolume),
+      })
+      .then((res) => {
+        const Luphohlo_Daily_Level = res.data.level;
+        this.setState({ Luphohlo_Daily_Level });
+      });
+    this.setState({ Luphohlo_Daily_Volume_Perc });
   };
   gsOnfocusOut = (e) => {
     let currentValue = e.target.value;
@@ -242,6 +267,22 @@ class GenerateSchedule extends Component {
     const disabled = this.isValid();
     this.setState({ disabled });
     this.context.handleForecastDateChange(this.state.startDate);
+
+    // update luphohlo volume percentage
+    this.context
+      .interpolate("luphohlo-level-interpolate", {
+        level: parseInt(this.state.Luphohlo_Daily_Level),
+      })
+      .then((res) => {
+        const Luphohlo_Daily_Volume = res.data.volume;
+        this.updatePerc(Luphohlo_Daily_Volume);
+      });
+  };
+  updatePerc = (Luphohlo_Daily_Volume) => {
+    const Luphohlo_Daily_Volume_Perc = this.context.volumeToPerc(
+      Luphohlo_Daily_Volume
+    );
+    this.setState({ Luphohlo_Daily_Volume_Perc });
   };
   handleDateChangeRaw = (e) => {
     e.preventDefault();
@@ -254,7 +295,7 @@ class GenerateSchedule extends Component {
       <>
         <div className="content">
           <Row>
-            <Col md="12" lg="12" xl="6">
+            <Col xs="12" sm="12" md="12" lg="12" xl="6">
               <Card>
                 <CardHeader>
                   <h4 className="title">ENTER INFLOWS</h4>
@@ -263,7 +304,7 @@ class GenerateSchedule extends Component {
                 <CardBody>
                   <Form>
                     <Row>
-                      <Col className="pr-md-1 calender" md="12" lg="4">
+                      <Col className="pr-md-1 calender" md="6" lg="4">
                         <FormGroup>
                           <label htmlFor="exampleInputEmail1">
                             Select Date:
@@ -300,8 +341,36 @@ class GenerateSchedule extends Component {
                           </Input>
                         </FormGroup>
                       </Col>
+                      {/* <Col className="pr-md-1" md="4">
+                        <FormGroup>
+                          <label>Luphohlo Daily Level(m.a.s.l)</label>
+                          <Input
+                            id="Luphohlo_Daily_Level"
+                            placeholder="m.a.s.l."
+                            required
+                            type="number"
+                            value={this.state.Luphohlo_Daily_Level}
+                            onBlur={this.luphohloOnfocusOut}
+                            onChange={this.handleInputChange}
+                          />
+                        </FormGroup>
+                      </Col> */}
                     </Row>
                     <Row>
+                      {/* <Col className="pr-md-1" md="3">
+                        <FormGroup>
+                          <label>Luphohlo Daily Level (%)</label>
+                          <Input
+                            id="Luphohlo_Daily_Volume_Perc"
+                            placeholder="%"
+                            required
+                            type="number"
+                            onBlur={this.volumePercOnfocusOut}
+                            value={this.state.Luphohlo_Daily_Volume_Perc}
+                            onChange={this.handleInputChange}
+                          />
+                        </FormGroup>
+                      </Col> */}
                       <Col className="pr-md-1" md="3">
                         <FormGroup>
                           <label>Luphohlo Daily Level</label>

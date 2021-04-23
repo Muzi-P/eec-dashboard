@@ -100,6 +100,7 @@
 @import "black-dashboard-react/custom/cards/card-plain";
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
 
+
 // Drainange Model
 .reveiwYear {
   border: 0;
@@ -126,7 +127,8 @@
   height: 3px !important;
 }
 .MuiTextField-root {
-  border-color: #2b3553 !important;
+  border-color: #2b3553 !important; 
+  width: 100%;
 }
 p.MuiTypography-root.MuiTypography-body1.MuiTypography-alignCenter {
   color: #3f51b5;
@@ -342,9 +344,19 @@ button.ghost {
   border-collapse: collapse;
   border-spacing: 0;
   margin: auto auto;
-  width: 500px;
+  width: 470px;
   color: white;
 }
+@include media-breakpoint-up(xl) {
+  .tg {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: auto auto;
+    width: 600px;
+    color: white;
+  }
+}
+
 .tg td {
   border-color: black;
   border-style: solid;
@@ -408,6 +420,16 @@ button.ghost {
 .form-control[disabled],
 fieldset[disabled] {
   color: white;
-  background-color: #cccccc1f;
+  background-color:transparent;
   cursor: not-allowed;
 }
+.card .card-header .card-title {
+  color: #ffffff;
+  font-weight: 600;
+}
+.card .card-header .card-category {
+  color: #ffffff;
+  margin-bottom: 5px;
+  font-weight: 300;
+}
+

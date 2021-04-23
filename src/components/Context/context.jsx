@@ -162,7 +162,7 @@ class InflowsProvider extends Component {
           powerStation: "maguga",
         },
         {
-          text: "Weir Initial Level(m³)",
+          text: "Weir Initial Volume(m³)",
           value: "",
           powerStation: "maguga",
         },
@@ -182,12 +182,22 @@ class InflowsProvider extends Component {
           powerStation: "maguga",
         },
         {
+          text: "Actual Water Consumed(m³)",
+          value: "",
+          powerStation: "maguga",
+        },
+        {
           text: "Weir Final Level(m.a.s.l)",
           value: "",
           powerStation: "maguga",
         },
         {
-          text: "Weir Final Level(m³)",
+          text: "Weir Final Volume(m³)",
+          value: "",
+          powerStation: "maguga",
+        },
+        {
+          text: "Weir Final Level(%)",
           value: "",
           powerStation: "maguga",
         },
@@ -719,6 +729,7 @@ class InflowsProvider extends Component {
       : [year, month, day].join("-");
   };
   volumeToPerc = (volume) => ((volume / 23600000) * 100).toFixed(2);
+  percToVolume = (perc) => ((perc / 100) * 23600000).toFixed(2);
   generateSchedule = async (state) => {
     const {
       startDate,
@@ -1425,16 +1436,18 @@ class InflowsProvider extends Component {
 
     let finalDamVolume =
       DAILY_LUPHOHLO_INFLOW + INITIAL_LUPHOHLO_DAM_VOLUME - waterConsumed;
-    finalDamVolume = this.volumeToPerc(finalDamVolume);
+    let finalDamVolumePer = this.volumeToPerc(finalDamVolume);
 
     waterConsumed = (waterConsumed / 1000000).toFixed(2);
     this.updateSummary("Water Used (mil. m³)", waterConsumed);
-    this.updateSummary("Final Dam Level(%)", finalDamVolume);
+    this.updateSummary("Final Dam Level(%)", finalDamVolumePer);
     this.interpolate("luphohlo-volume-interpolate", {
-      volume: finalDamVolume,
+      volume: parseInt(finalDamVolume),
     }).then((res) => {
-      console.log(res);
+      this.updateSummary("Final Dam Level(m.a.s.l)", res.data.level);
     });
+    this.updateSummary("Required Water (mil. m³)", "N/A");
+    this.updateSummary("Earliest Generation (time)", "N/A");
     await this.setState({ currentSchedule: generatedSchedule });
   };
   populateScheduleWeekDayEzulwinOffPeakSeason = async (GS_2, Ferreira) => {
@@ -1556,25 +1569,37 @@ class InflowsProvider extends Component {
     return parseFloat(peakkFullLoadWater); //  85500
   };
   populateScheduleWeekDayPeakSeason = async (Luphohlo_Daily_Level) => {
+    const {
+      DAILY_LUPHOHLO_INFLOW,
+      INITIAL_LUPHOHLO_DAM_VOLUME,
+      PEAK,
+    } = this.state.ezulwini;
     let generatedSchedule = this.state.utils.methods.ezulwiniShutDown(
       this.state.currentSchedule
     );
+    let waterConsumed = 0;
     // ezulwini
     if (parseInt(Luphohlo_Daily_Level) > 1002) {
       generatedSchedule = this.state.utils.methods.ezulwiniPeakFullLoad(
         generatedSchedule
       );
-      let waterConsumed = (this.state.ezulwini.PEAK / 1000000).toFixed(2);
+      waterConsumed = (PEAK / 1000000).toFixed(2);
       this.updateSummary("Water Used (mil. m³)", waterConsumed);
     }
 
-    // edwaleni
-    generatedSchedule = this.state.utils.methods.edwaleniPeakFullLoad(
-      generatedSchedule
-    );
-    generatedSchedule = this.state.utils.methods.maguduzaPeakFullLoad(
-      generatedSchedule
-    );
+    let finalDamVolume =
+      DAILY_LUPHOHLO_INFLOW + INITIAL_LUPHOHLO_DAM_VOLUME - waterConsumed;
+    this.interpolate("luphohlo-volume-interpolate", {
+      volume: finalDamVolume,
+    }).then((res) => {
+      this.updateSummary("Final Dam Level(m.a.s.l)", res.data.level);
+    });
+    finalDamVolume = this.volumeToPerc(finalDamVolume);
+    waterConsumed = (waterConsumed / 1000000).toFixed(2);
+    this.updateSummary("Final Dam Level(%)", finalDamVolume);
+    this.updateSummary("Required Water (mil. m³)", "N/A");
+    this.updateSummary("Earliest Generation (time)", "N/A");
+
     await this.setState({ currentSchedule: generatedSchedule });
   };
   /**
@@ -1651,12 +1676,71 @@ class InflowsProvider extends Component {
     this.interpolate("weir-level-interpolate", {
       level: Regulating_Weir,
     }).then((res) => {
-      this.updateSummary("Weir Initial Level(m³)", res.data.volume);
+      this.updateSummary("Weir Initial Volume(m³)", res.data.volume);
       this.updateSummary(
         "Weir Initial Level(%)",
         this.weirVolumeToPerc(res.data.volume)
       );
     });
+
+    // calculate water consumed by Maguga machines
+    const totalMagugaWaterConsumed = this.calcWaterConsumedByMagugaGeneration(
+      `${availableHours}`
+    );
+    // const waterDifference = availableWater - totalMagugaWaterConsumed;
+    const finalWeirVolume =
+      currentVolume - irrigationVolume + totalMagugaWaterConsumed;
+    // update UI
+    this.updateSummary("Weir Final Volume(m³)", finalWeirVolume.toFixed(0));
+    this.updateSummary(
+      "Actual Water Consumed(m³)",
+      totalMagugaWaterConsumed.toFixed(0)
+    );
+    this.updateSummary(
+      "Weir Final Level(%)",
+      this.weirVolumeToPerc(finalWeirVolume)
+    );
+    this.interpolate("weir-volume-interpolate", {
+      volume: finalWeirVolume,
+    }).then((res) => {
+      this.updateSummary("Weir Final Level(m.a.s.l)", res.data.level);
+    });
+  };
+  /**
+   * @description calculate total water consumed during maguga generation
+   */
+  calcWaterConsumedByMagugaGeneration = (availableHours) => {
+    const availableHoursSplit = availableHours.split(".");
+    const availableHoursInt = availableHoursSplit[0];
+    const availableHoursFrac = availableHoursSplit[1];
+
+    // water consumed by whole number of availableHours
+
+    const hourlySetsWater = this.calcWaterConsumedByMagugaSetsFullLoad();
+    const waterForHoursInt = hourlySetsWater * availableHoursInt;
+
+    // water consumed by fraction of availableHours
+    const finalWattage = this.handleMagugaHalfGen(availableHoursFrac);
+    const magugaRatedFlow = parseFloat(
+      this.state.magugaPS.Genarators[0].Rated_Flow
+    );
+    const waterForHoursFrac = this.calWaterConsumedByAnyMachine(
+      1,
+      finalWattage,
+      magugaRatedFlow
+    );
+    return waterForHoursInt + waterForHoursFrac;
+  };
+  handleMagugaHalfGen = (hourFraction) => {
+    let power = 0;
+    if (hourFraction === 0) {
+      power = 0;
+    } else if (hourFraction >= 3 && hourFraction <= 8) {
+      power = 10;
+    } else if (hourFraction > 8) {
+      power = 20;
+    }
+    return power;
   };
   weirVolumeToPerc = (volume) => ((volume / 987500) * 100).toFixed(2);
   luphohloVolumeToMillionVol = (volume) =>
@@ -2308,6 +2392,9 @@ class InflowsProvider extends Component {
           exportSchedules: this.exportSchedules,
           getCurrentSchedule: this.getCurrentSchedule,
           editRatedFlow: this.editRatedFlow,
+          percToVolume: this.percToVolume,
+          interpolate: this.interpolate,
+          volumeToPerc: this.volumeToPerc,
         }}
       >
         {this.props.children}
