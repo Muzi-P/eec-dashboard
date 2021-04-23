@@ -127,7 +127,7 @@ export default class ViewModel extends Component {
                         <Input
                           value={model.createdAt.split("T")[0]}
                           type="text"
-                          disabled={!admin}
+                          disabled={true}
                           onChange={this.handleModelNAmeChange}
                         />
                       </FormGroup>
@@ -138,7 +138,7 @@ export default class ViewModel extends Component {
                         <Input
                           value={model.updatedAt.split("T")[0]}
                           onChange={this.handleModelNAmeChange}
-                          disabled={!admin}
+                          disabled={true}
                           type="text"
                         />
                       </FormGroup>
