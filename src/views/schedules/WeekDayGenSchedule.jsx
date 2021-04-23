@@ -63,7 +63,7 @@ export default class WeekDayGenSchedule extends Component {
                   search: false,
                 }}
                 editable={{
-                  onRowUpdate: admin
+                  onRowUpdate: false
                     ? (newData, oldData) =>
                         new Promise((resolve) => {
                           setTimeout(() => {
