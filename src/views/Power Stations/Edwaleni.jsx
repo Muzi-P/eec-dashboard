@@ -171,7 +171,7 @@ export class Edwaleni extends Component {
                         <Input
                           onChange={this.handleEdwaleniInputChange}
                           value={edwaleniPS.Genarators[1].Rated_Power}
-                          disabled={!admin}
+                          disabled={true}
                           type="number"
                         />
                       </FormGroup>

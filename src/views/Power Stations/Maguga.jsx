@@ -107,7 +107,7 @@ export class Maguga extends Component {
                         <Input
                           onChange={this.handleChange}
                           value={magugaPS.Genarators[0].Rated_Power}
-                          disabled={!admin}
+                          disabled={true}
                           type="number"
                         />
                       </FormGroup>
@@ -118,7 +118,7 @@ export class Maguga extends Component {
                         <Input
                           onChange={this.handleChange}
                           value={magugaPS.Genarators[0].Units}
-                          disabled={!admin}
+                          disabled={true}
                           type="number"
                         />
                       </FormGroup>
@@ -142,7 +142,7 @@ export class Maguga extends Component {
                         <Input
                           onChange={this.handleChange}
                           value={magugaPS.Genarators[1].Rated_Power}
-                          disabled={!admin}
+                          disabled={true}
                           type="number"
                         />
                       </FormGroup>
@@ -152,7 +152,7 @@ export class Maguga extends Component {
                         <Input
                           onChange={this.handleChange}
                           value={magugaPS.Genarators[1].Units}
-                          disabled={!admin}
+                          disabled={true}
                           type="number"
                         />
                       </FormGroup>

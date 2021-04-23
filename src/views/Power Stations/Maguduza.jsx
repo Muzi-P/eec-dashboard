@@ -103,7 +103,7 @@ export class Maguduza extends Component {
                         <Input
                           onChange={this.handleMaguduzaInputChange}
                           value={maguduzaPS.Genarators[0].Rated_Power}
-                          disabled={!admin}
+                          disabled={true}
                           type="number"
                         />
                       </FormGroup>
@@ -114,7 +114,7 @@ export class Maguduza extends Component {
                         <Input
                           onChange={this.handleMaguduzaInputChange}
                           value={maguduzaPS.Genarators[0].Units}
-                          disabled={!admin}
+                          disabled={true}
                           type="number"
                         />
                       </FormGroup>
