@@ -121,11 +121,11 @@ class InflowsProvider extends Component {
           value: "N/A",
           powerStation: "ezulwini",
         },
-        {
-          text: "Earliest Generation (time)",
-          value: "Immediately",
-          powerStation: "ezulwini",
-        },
+        // {
+        //   text: "Earliest Generation (time)",
+        //   value: "Immediately",
+        //   powerStation: "ezulwini",
+        // },
         {
           text: "Water Used (mil. m³)",
           value: "",
