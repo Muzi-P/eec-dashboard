@@ -116,7 +116,7 @@ export default class ViewModel extends Component {
                           onChange={this.handleModelNAmeChange}
                           value={model.Model_Name}
                           id="Model_Name"
-                          disabled={!admin}
+                          disabled={true}
                           type="text"
                         />
                       </FormGroup>
